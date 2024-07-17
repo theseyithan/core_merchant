@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require "active_support"
+require "active_support/concern"
 require_relative "core_merchant/version"
 require_relative "core_merchant/customer_behavior"
 
