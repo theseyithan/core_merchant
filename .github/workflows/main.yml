@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - main
-
   pull_request:
 
 jobs:
@@ -23,11 +22,13 @@ jobs:
       with:
         ruby-version: ${{ matrix.ruby }}
         bundler-cache: true
-    - name: Install dependencies for sqlite3
+    - name: Install sqlite3
       run: |
         sudo apt-get update
-        sudo apt-get install -y libsqlite3-dev build-essential
+        sudo apt-get install -y libsqlite3-dev
     - name: Install Ruby dependencies
-      run: bundle install --jobs 4 --retry 3
+      run: |
+        bundle config set --local build.sqlite3 --enable-system-libraries
+        bundle install --jobs 4 --retry 3
     - name: Run the default task
       run: bundle exec rake

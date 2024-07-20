@@ -13,7 +13,11 @@ Layout/LineLength:
   Max: 120
 
 # Disable frozen string literals for lib/generators/**
-
 FrozenStringLiteralComment:
   Exclude:
     - 'lib/generators/**/templates/*'
+
+# Disable block length for spec files
+Metrics/BlockLength:
+  Exclude:
+    - 'spec/**/*'

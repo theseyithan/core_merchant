@@ -4,6 +4,9 @@ class CreateCoreMerchantSubscriptionPlans < ActiveRecord::Migration
     create_table :core_merchant_subscription_plans do |t|
       t.string :name_key, null: false
       t.integer :price_cents, null: false, default: 0
+      t.string :duration, null: false
+      t.integer :introductory_price_cents
+      t.string :introductory_duration
 
       t.timestamps
 

@@ -7,7 +7,8 @@ RSpec.describe CoreMerchant::SubscriptionPlan do
   let(:plan) do
     CoreMerchant::SubscriptionPlan.new(
       name_key: "basic.monthly",
-      price_cents: 9_99
+      price_cents: 9_99,
+      duration: "1m"
     )
   end
 
@@ -38,6 +39,57 @@ RSpec.describe CoreMerchant::SubscriptionPlan do
     it "is invalid with a non-integer price cents" do
       plan.price_cents = 9.99
       expect(plan).to_not be_valid
+    end
+
+    it "is invalid without a duration" do
+      plan.duration = nil
+      expect(plan).to_not be_valid
+    end
+
+    it "is invalid with an invalid duration" do
+      plan.duration = "1week"
+      expect(plan).to_not be_valid
+
+      plan.duration = "monthly"
+      expect(plan).to_not be_valid
+    end
+
+    it "is invalid with an invalid introductory price cents" do
+      plan.introductory_price_cents = 9.99
+      expect(plan).to_not be_valid
+    end
+
+    it "is invalid with an invalid introductory duration" do
+      plan.introductory_duration = "1week"
+      expect(plan).to_not be_valid
+    end
+  end
+
+  describe "calculated attributes" do
+    it "returns the name" do
+      expect(plan.name).to eq("Basic.monthly")
+    end
+
+    it "returns the price" do
+      expect(plan.price).to eq(9.99)
+    end
+
+    it "returns the introductory price" do
+      plan.introductory_price_cents = 7_99
+      expect(plan.introductory_price).to eq(7.99)
+    end
+
+    it "returns the duration in date" do
+      expect(plan.duration_in_date).to eq(1.month)
+    end
+
+    it "returns the introductory duration in date" do
+      plan.introductory_duration = "2w"
+      expect(plan.introductory_duration_in_date).to eq(2.weeks)
+    end
+
+    it "returns a string representation" do
+      expect(plan.to_s).to eq("Basic.monthly - 9.99")
     end
   end
 
