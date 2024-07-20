@@ -5,6 +5,8 @@ class CreateCoreMerchantSubscriptionPlans < ActiveRecord::Migration
       t.string :name_key, null: false
       t.integer :price_cents, null: false, default: 0
 
+      t.timestamps
+
       t.index :name_key, unique: true
     end
   end

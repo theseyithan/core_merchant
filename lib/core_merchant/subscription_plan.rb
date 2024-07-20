@@ -20,7 +20,7 @@ module CoreMerchant
   class SubscriptionPlan < ActiveRecord::Base
     self.table_name = "core_merchant_subscription_plans"
     validates :name_key, presence: true, uniqueness: true
-    validates :price_cents, presence: true, numericality: { greater_than_or_equal_to: 0 }
+    validates :price_cents, presence: true, numericality: { greater_than_or_equal_to: 0, only_integer: true }
 
     def name
       I18n.t(name_key, scope: "core_merchant.subscription_plans", default: name_key.humanize)

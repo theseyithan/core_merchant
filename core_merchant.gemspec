@@ -36,9 +36,11 @@ Gem::Specification.new do |spec|
   spec.add_dependency "activesupport", "~> 7.0"
   spec.add_dependency "rails", "~> 7.0"
 
+  spec.add_development_dependency "database_cleaner"
   spec.add_development_dependency "generator_spec", "~> 0.9.4"
   spec.add_development_dependency "railties", "~> 7.0"
   spec.add_development_dependency "rspec-rails", "~> 5.0"
+  spec.add_development_dependency "sqlite3", "~> 1.4"
 
   # For more information and examples about making a new gem, check out our
   # guide at: https://bundler.io/guides/creating_gem.html
