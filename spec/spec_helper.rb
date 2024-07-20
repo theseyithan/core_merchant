@@ -6,6 +6,7 @@ Bundler.setup
 require "core_merchant"
 require "rails"
 require "rails/generators"
+require "generator_spec"
 
 RSpec.configure do |config|
   # Enable flags like --only-failures and --next-failure
