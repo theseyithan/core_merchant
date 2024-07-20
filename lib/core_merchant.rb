@@ -4,6 +4,7 @@ require "active_support"
 require "active_support/concern"
 require_relative "core_merchant/version"
 require_relative "core_merchant/customer_behavior"
+require_relative "core_merchant/subscription_plan"
 
 # CoreMerchant module
 module CoreMerchant
