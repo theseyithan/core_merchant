@@ -21,7 +21,7 @@ module CoreMerchant
       def create_migration_file
         timestamp = self.class.next_migration_number(nil)
         migration_template "create_core_merchant_subscription_plans.rb",
-                           "db/migrate/#{timestamp}_create_core_merchant_subscription_plans.rb"
+                           "db/migrate/create_core_merchant_subscription_plans.rb"
       end
     end
   end
