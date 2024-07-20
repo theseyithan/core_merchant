@@ -1,6 +1,11 @@
 # frozen_string_literal: true
 
+require "bundler/setup"
+Bundler.setup
+
 require "core_merchant"
+require "rails"
+require "rails/generators"
 
 RSpec.configure do |config|
   # Enable flags like --only-failures and --next-failure
