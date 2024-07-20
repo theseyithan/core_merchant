@@ -1,39 +1,77 @@
 # CoreMerchant
 
-## This gem is under development at pre-release stage
+> [!CAUTION]
+> This gem is under development at pre-release stage
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/core_merchant`. To experiment with that code, run `bin/console` for an interactive prompt.
-
-TODO: Delete this and the text above, and describe your gem
+CoreMerchant is a library for customer, product, and subscription management in Rails applications. It's meant to be a starting point for building e-commerce and SaaS applications. It provides essential functionality for handling customers, products, and subscriptions. Does not include payment integrations.
 
 ## Installation
+Add this line to your application's Gemfile:
+```
+gem 'core_merchant', '~> 0.1.0'
+```
+and run `bundle install`.
 
-Install the gem and add to the application's Gemfile by executing:
-
-    $ bundle add core_merchant
-
-If bundler is not being used to manage dependencies, install the gem by executing:
-
-    $ gem install core_merchant
+Alternatively, you can install the gem manually:
+```
+$ gem install core_merchant
+```
 
 ## Usage
+### Initialization
+Run the generator to create the initializer file and the migrations:
+```
+$ rails generate core_merchant:install
+```
+This will create the following files:
+- `config/initializers/core_merchant.rb` - Configuration file
+- `db/migrate/xxxxxx_create_core_merchant_subscription_plans.rb` - Migration for subscription plans
 
-TODO: Write usage instructions here
+You can then run the migrations:
+```
+$ rails db:migrate
+```
 
-## Development
+### Configuration
+The initializer file `config/initializers/core_merchant.rb` contains the following configuration options:
+```ruby
+config.customer_class
+```
 
-After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake spec` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
+### The cusomer class
+The customer class is the model that represents the customer in your application. For example, if you already have a `User` model that represents the users of your application, you can use it as the customer class in CoreMerchant. To do this, you need to set the `customer_class` configuration option in the initializer file:
+```ruby
+# config/initializers/core_merchant.rb
+CoreMerchant.configure do |config|
+  config.customer_class = 'User'
+end
+```
 
-To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release`, which will create a git tag for the version, push git commits and the created tag, and push the `.gem` file to [rubygems.org](https://rubygems.org).
+You need to then include the `CoreMerchant::Customer` module in the customer class:
+```ruby
+# app/models/user.rb
+class User < ApplicationRecord
+  include CoreMerchant::Customer
+
+  # ... the rest of your model code
+end
+```
+
+## Models
+### SubscriptionPlan
+The `SubscriptionPlan` model represents a subscription plan in your application. It has the following attributes:
+- `name_key`: A unique key for the subscription plan.
+            This key is used to identify the plan in the application,
+            as well as the translation key for the plan name through `core_merchant.subscription_plans`.
+- `price_cents`: The price of the subscription plan in cents.
+- `duration`: The duration of the subscription plan.
+              Consists of a number and a letter representing the time unit as day, week, month, or year.
+              For example, `1w` for 1 week, `3m` for 3 months, `1y` for 1 year.
+- `introductory_price_cents`: The introductory price of the subscription plan in cents.
+- `introductory_duration`: The duration of the introductory price of the subscription plan.
+
+> [!NOTE]
+> Other models and features are being developed and will be added in future releases.
 
 ## Contributing
-
-Bug reports and pull requests are welcome on GitHub at https://github.com/[USERNAME]/core_merchant. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [code of conduct](https://github.com/[USERNAME]/core_merchant/blob/main/CODE_OF_CONDUCT.md).
-
-## License
-
-The gem is available as open source under the terms of the [MIT License](https://opensource.org/licenses/MIT).
-
-## Code of Conduct
-
-Everyone interacting in the CoreMerchant project's codebases, issue trackers, chat rooms and mailing lists is expected to follow the [code of conduct](https://github.com/[USERNAME]/core_merchant/blob/main/CODE_OF_CONDUCT.md).
+Bug reports and pull requests are welcome on GitHub at https://github.com/theseyithan/core_merchant
