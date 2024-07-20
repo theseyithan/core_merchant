@@ -33,7 +33,9 @@ module CoreMerchant
 
       def show_post_install
         say "CoreMerchant has been successfully installed.", :green
-        say "Customer class: #{@customer_class}"
+        say <<~MESSAGE
+          Customer class: #{@customer_class}. Please update this model to include the CoreMerchant::CustomerBehavior module.
+        MESSAGE
         say "Please run `rails db:migrate` to create the subscription plans table."
       end
 

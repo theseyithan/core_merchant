@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    core_merchant (0.5.0)
+    core_merchant (0.5.1)
       activesupport (~> 7.0)
       rails (~> 7.0)
 

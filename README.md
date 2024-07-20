@@ -47,10 +47,10 @@ $ rails db:migrate
 ### Configuration
 The initializer file `config/initializers/core_merchant.rb` contains the following configuration options:
 ```ruby
-config.customer_class
+config.customer_class = 'User'
 ```
 
-You need to then include the `CoreMerchant::Customer` module in the customer class:
+You need to include the `CoreMerchant::Customer` module in the customer class:
 ```ruby
 # app/models/user.rb
 class User < ApplicationRecord
