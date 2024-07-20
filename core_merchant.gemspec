@@ -2,7 +2,7 @@
 
 require_relative "lib/core_merchant/version"
 
-Gem::Specification.new do |spec|
+Gem::Specification.new do |spec| # rubocop:disable Metrics/BlockLength
   spec.name = "core_merchant"
   spec.version = CoreMerchant::VERSION
   spec.authors = ["Seyithan Teymur"]

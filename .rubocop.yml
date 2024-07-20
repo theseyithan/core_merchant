@@ -16,6 +16,7 @@ Layout/LineLength:
 FrozenStringLiteralComment:
   Exclude:
     - 'lib/generators/**/templates/*'
+    - 'spec/**/tmp/**/*'
 
 # Disable block length for spec files
 Metrics/BlockLength:
