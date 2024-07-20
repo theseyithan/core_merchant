@@ -10,7 +10,11 @@ RSpec.describe CoreMerchant::Generators::InstallGenerator, type: :generator do
 
   before do
     prepare_destination
-    run_generator
+    run_generator ["TestUser"]
+  end
+
+  after do
+    FileUtils.rm_rf(destination_root)
   end
 
   it "creates the subscription plan migration file" do
