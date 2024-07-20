@@ -31,8 +31,10 @@ $ gem install core_merchant
 ### Initialization
 Run the generator to create the initializer file and the migrations:
 ```
-$ rails generate core_merchant:install
+$ rails generate core_merchant:install --customer_class=User
 ```
+`--customer_class` option is required and should be the name of the model that represents the customer in your application. For example, if you already have a `User` model that represents the users of your application, you can use it as the customer class in CoreMerchant.
+
 This will create the following files:
 - `config/initializers/core_merchant.rb` - Configuration file
 - `db/migrate/xxxxxx_create_core_merchant_subscription_plans.rb` - Migration for subscription plans
@@ -46,15 +48,6 @@ $ rails db:migrate
 The initializer file `config/initializers/core_merchant.rb` contains the following configuration options:
 ```ruby
 config.customer_class
-```
-
-### The cusomer class
-The customer class is the model that represents the customer in your application. For example, if you already have a `User` model that represents the users of your application, you can use it as the customer class in CoreMerchant. To do this, you need to set the `customer_class` configuration option in the initializer file:
-```ruby
-# config/initializers/core_merchant.rb
-CoreMerchant.configure do |config|
-  config.customer_class = 'User'
-end
 ```
 
 You need to then include the `CoreMerchant::Customer` module in the customer class:
