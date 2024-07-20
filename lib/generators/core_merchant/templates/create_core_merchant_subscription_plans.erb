@@ -1,5 +1,5 @@
 # Created by: rails generate core_merchant:install
-class CreateCoreMerchantSubscriptionPlans < ActiveRecord::Migration
+class CreateCoreMerchantSubscriptionPlans < ActiveRecord::Migration[<%= ActiveRecord::Migration.current_version %>]
   def change
     create_table :core_merchant_subscription_plans do |t|
       t.string :name_key, null: false
