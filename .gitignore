@@ -5,7 +5,8 @@
 /doc/
 /pkg/
 /spec/reports/
-/tmp/
+/spec/core_merchant/tmp
+/tmp
 
 # rspec failure tracking
 .rspec_status

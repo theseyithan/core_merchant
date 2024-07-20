@@ -11,3 +11,9 @@ Style/StringLiteralsInInterpolation:
 
 Layout/LineLength:
   Max: 120
+
+# Disable frozen string literals for lib/generators/**
+
+FrozenStringLiteralComment:
+  Exclude:
+    - 'lib/generators/**/templates/*'
