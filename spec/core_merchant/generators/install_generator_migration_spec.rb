@@ -10,7 +10,7 @@ RSpec.describe CoreMerchant::Generators::InstallGenerator, type: :generator do
 
   before do
     prepare_destination
-    run_generator ["TestUser"]
+    run_generator ["--customer_class=TestUser"]
   end
 
   after do

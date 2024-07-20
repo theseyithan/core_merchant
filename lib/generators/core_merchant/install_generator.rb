@@ -10,11 +10,12 @@ module CoreMerchant
 
       source_root File.expand_path("templates", __dir__)
 
-      argument :customer_class, type: :string
+      class_option :customer_class, type: :string, required: true,
+                                    desc: "Name of your existing customer class, e.g. User"
 
       def copy_initializer
-        @customer_class = customer_class.to_s.classify
-        template "core_merchant.erb", "config/initializers/core_merchant.rb", customer_class: @customer_class
+        @customer_class = options[:customer_class].classify
+        template "core_merchant.erb", "config/initializers/core_merchant.rb"
       end
 
       def copy_locales
@@ -32,12 +33,12 @@ module CoreMerchant
 
       def show_post_install
         say "CoreMerchant has been successfully installed.", :green
-        say "Customer class: #{customer_class.classify}"
+        say "Customer class: #{@customer_class}"
         say "Please run `rails db:migrate` to create the subscription plans table."
       end
 
       def self.banner
-        "rails generate core_merchant:install --customer_class=Customer"
+        "rails generate core_merchant:install --customer_class=User"
       end
 
       def self.description
