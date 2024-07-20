@@ -14,6 +14,10 @@ module CoreMerchant
         template "core_merchant.rb", "config/initializers/core_merchant.rb"
       end
 
+      def copy_locales
+        template "core_merchant.en.yml", "config/locales/core_merchant.en.yml"
+      end
+
       def self.next_migration_number(_dir)
         Time.now.utc.strftime("%Y%m%d%H%M%S")
       end

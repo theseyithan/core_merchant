@@ -18,7 +18,7 @@ module CoreMerchant
   #
   # Example:
   #  ```
-  #   plan = CoreMerchant::SubscriptionPlan.new(name_key: "basic.monthly", price_cents: 7_99)
+  #   plan = CoreMerchant::SubscriptionPlan.new(name_key: "basic_monthly", price_cents: 7_99)
   #   plan.save
   #  ```
   #

@@ -1,0 +1,4 @@
+en:
+  core_merchant:
+    subscription_plans:
+      example: "Super Awesome Example Plan" # Remove this and add your own subscription plans

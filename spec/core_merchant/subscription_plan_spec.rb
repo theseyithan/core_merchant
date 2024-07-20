@@ -6,7 +6,7 @@ require "core_merchant/subscription_plan"
 RSpec.describe CoreMerchant::SubscriptionPlan do
   let(:plan) do
     CoreMerchant::SubscriptionPlan.new(
-      name_key: "basic.monthly",
+      name_key: "basic_monthly",
       price_cents: 9_99,
       duration: "1m"
     )
@@ -66,8 +66,17 @@ RSpec.describe CoreMerchant::SubscriptionPlan do
   end
 
   describe "calculated attributes" do
-    it "returns the name" do
-      expect(plan.name).to eq("Basic.monthly")
+    it "returns the translated name" do
+      plan.name_key = "example"
+      allow(I18n).to receive(:t).with(
+        "example", scope: "core_merchant.subscription_plans",
+                   default: "Example"
+      ).and_return("Super Awesome Example Plan")
+      expect(plan.name).to eq("Super Awesome Example Plan")
+    end
+
+    it "returns the humanized name unless it's translated" do
+      expect(plan.name).to eq("Basic monthly")
     end
 
     it "returns the price" do
@@ -89,7 +98,7 @@ RSpec.describe CoreMerchant::SubscriptionPlan do
     end
 
     it "returns a string representation" do
-      expect(plan.to_s).to eq("Basic.monthly - 9.99")
+      expect(plan.to_s).to eq("Basic monthly - 9.99")
     end
   end
 
