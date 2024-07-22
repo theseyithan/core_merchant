@@ -99,12 +99,6 @@ module CoreMerchant
 
     private
 
-    def set_period_dates
-      self.start_date ||= Time.current
-      self.current_period_start ||= start_date
-      self.current_period_end ||= start_date + subscription_plan.duration_in_date
-    end
-
     def end_date_after_start_date
       errors.add(:end_date, "must be after the `start date") if end_date <= start_date
     end
