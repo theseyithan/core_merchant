@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require "core_merchant/concerns/subscription_state_machine"
+
 module CoreMerchant
   # Represents a subscription in CoreMerchant.
   # This class manages the lifecycle of a customer's subscription to a specific plan.
@@ -9,10 +11,10 @@ module CoreMerchant
   # - `trial`: In a trial period
   # - `active`: Currently active and paid
   # - `past_due`: Payment failed but in grace period, not yet implemented
+  # - `pending_cancellation`: Will be canceled at period end
   # - `canceled`: Canceled by user or due to payment failure
   # - `expired`: Subscription period ended
   # - `paused`: Temporarily halted, not yet implemented
-  # - `pending_cancellation`: Will be canceled at period end
   # - `pending_change`: Plan change scheduled for next renewal, not yet implemented
   #
   # **Key features**:
@@ -48,6 +50,8 @@ module CoreMerchant
   #   subscription.renew(price_cents: 1999)
   #   ```
   class Subscription < ActiveRecord::Base
+    include CoreMerchant::Concerns::SubscriptionStateMachine
+
     self.table_name = "core_merchant_subscriptions"
 
     belongs_to :customer, polymorphic: true
@@ -58,10 +62,10 @@ module CoreMerchant
       trial: 1,
       active: 2,
       past_due: 3, # Logic not yet implemented
-      canceled: 4,
-      expired: 5,
-      paused: 6, # Logic not yet implemented
-      pending_cancellation: 7,
+      pending_cancellation: 4,
+      canceled: 5,
+      expired: 6,
+      paused: 7, # Logic not yet implemented
       pending_change: 8 # Logic not yet implemented
     }
 
