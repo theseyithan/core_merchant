@@ -20,8 +20,6 @@ class CreateCoreMerchantSubscriptions < ActiveRecord::Migration[<%= ActiveRecord
 
       t.timestamps
 
-      t.index :customer_id
-      t.index :subscription_plan_id
       t.index :status
     end
   end
