@@ -86,8 +86,12 @@ module CoreMerchant
     end
 
     def cancel(reason:, at_period_end:)
+      if at_period_end
+        transition_to_pending_cancellation!
+      else
+        transition_to_canceled!
+      end
       update!(
-        status: at_period_end ? :pending_cancellation : :canceled,
         canceled_at: at_period_end ? current_period_end : Time.current,
         cancellation_reason: reason
       )
