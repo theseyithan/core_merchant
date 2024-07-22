@@ -38,15 +38,15 @@ module CoreMerchant
           end
 
           define_method("transition_to_#{to_state}") do
-            raise InvalidTransitionError unless send("can_transition_to_#{to_state}?")
+            return false unless send("can_transition_to_#{to_state}?")
 
-            update_attribute(:status, to_state)
+            update(status: to_state)
           end
 
           define_method("transition_to_#{to_state}!") do
-            method_name = "transition_to_#{to_state}"
-            send(method_name)
-            save!
+            raise InvalidTransitionError unless send("transition_to_#{to_state}")
+
+            update!(status: to_state)
           end
         end
       end

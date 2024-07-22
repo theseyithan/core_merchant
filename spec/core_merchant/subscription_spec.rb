@@ -9,7 +9,7 @@ RSpec.describe CoreMerchant::Subscription do
     CoreMerchant::Subscription.new(
       customer: user,
       subscription_plan: plan,
-      status: :active,
+      status: :pending,
       start_date: 1.day.ago
     )
   end

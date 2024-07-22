@@ -84,13 +84,20 @@ RSpec.describe CoreMerchant::Subscription do
     it "updates status when transitioning" do
       subscription.status = :pending
       subscription.transition_to_active
-      expect(subscription.status).to eq("active")
+      expect(subscription).to be_active
     end
 
-    it "raises an error when transitioning to an invalid state" do
+    it "returns false when transitioning to an invalid state" do
       subscription.status = :pending
-      expect { subscription.transition_to_expired }
+      expect(subscription.transition_to_expired).to eq(false)
+      expect(subscription).to be_pending
+    end
+
+    it "raises an error when transitioning! to an invalid state" do
+      subscription.status = :pending
+      expect { subscription.transition_to_expired! }
         .to raise_error(CoreMerchant::Concerns::InvalidTransitionError)
+      expect(subscription).to be_pending
     end
   end
 end

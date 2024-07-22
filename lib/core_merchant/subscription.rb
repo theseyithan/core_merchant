@@ -78,15 +78,15 @@ module CoreMerchant
       new_period_start = start_date
       new_period_end = new_period_start + subscription_plan.duration_in_date
 
-      update(
-        status: :active,
+      transition_to_active!
+      update!(
         current_period_start: new_period_start,
         current_period_end: new_period_end
       )
     end
 
     def cancel(reason:, at_period_end:)
-      update(
+      update!(
         status: at_period_end ? :pending_cancellation : :canceled,
         canceled_at: at_period_end ? current_period_end : Time.current,
         cancellation_reason: reason
