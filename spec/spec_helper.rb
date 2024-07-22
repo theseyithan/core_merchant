@@ -10,6 +10,8 @@ require "rails"
 require "rails/generators"
 require "generator_spec"
 
+require "factory_bot"
+
 ActiveRecord::Base.establish_connection(adapter: "sqlite3", database: ":memory:")
 load "#{File.dirname(__FILE__)}/support/schema.rb"
 
@@ -24,9 +26,12 @@ RSpec.configure do |config|
     c.syntax = :expect
   end
 
+  config.include FactoryBot::Syntax::Methods
+
   config.before(:suite) do
     DatabaseCleaner.strategy = :transaction
     DatabaseCleaner.clean_with(:truncation)
+    FactoryBot.find_definitions
   end
 
   config.around(:each) do |example|

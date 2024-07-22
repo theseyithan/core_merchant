@@ -3,22 +3,8 @@
 require "spec_helper"
 
 RSpec.describe CoreMerchant::CustomerBehavior do
-  let(:customer_class) do
-    Class.new do
-      include CoreMerchant::CustomerBehavior
-
-      attr_accessor :id, :email, :name
-
-      def initialize(id:, email:, name: nil)
-        @id = id
-        @email = email
-        @name = name
-      end
-    end
-  end
-
   let(:customer) do
-    customer_class.new(id: 1, email: "test@example.com", name: "Test User")
+    build(:user)
   end
 
   it "provides a customer id" do
@@ -31,5 +17,9 @@ RSpec.describe CoreMerchant::CustomerBehavior do
 
   it "provides a customer name" do
     expect(customer.core_merchant_customer_name).to eq("Test User")
+  end
+
+  it "provides subscriptions" do
+    # expect(customer.subscriptions).to eq([])
   end
 end

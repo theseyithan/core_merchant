@@ -37,6 +37,7 @@ Gem::Specification.new do |spec| # rubocop:disable Metrics/BlockLength
   spec.add_dependency "rails", "~> 7.0"
 
   spec.add_development_dependency "database_cleaner"
+  spec.add_development_dependency "factory_bot"
   spec.add_development_dependency "generator_spec", "~> 0.9.4"
   spec.add_development_dependency "railties", "~> 7.0"
   spec.add_development_dependency "rspec-rails", "~> 5.0"
