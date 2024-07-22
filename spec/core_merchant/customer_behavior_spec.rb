@@ -20,6 +20,11 @@ RSpec.describe CoreMerchant::CustomerBehavior do
   end
 
   it "provides subscriptions" do
-    # expect(customer.subscriptions).to eq([])
+    expect(customer.subscriptions).to eq([])
+
+    subscription = build(:subscription, customer: customer)
+    subscription.save
+
+    expect(customer.subscriptions).to eq([subscription])
   end
 end
