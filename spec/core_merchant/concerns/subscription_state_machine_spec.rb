@@ -6,12 +6,7 @@ require "core_merchant/concerns/subscription_state_machine"
 
 RSpec.describe CoreMerchant::Subscription do
   let(:subscription) do
-    CoreMerchant::Subscription.new(
-      customer: user,
-      subscription_plan: plan,
-      status: :pending,
-      start_date: 1.day.ago
-    )
+    build(:subscription)
   end
 
   let(:user) do

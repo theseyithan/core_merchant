@@ -5,11 +5,7 @@ require "core_merchant/subscription_plan"
 
 RSpec.describe CoreMerchant::SubscriptionPlan do
   let(:plan) do
-    CoreMerchant::SubscriptionPlan.new(
-      name_key: "basic_monthly",
-      price_cents: 9_99,
-      duration: "1m"
-    )
+    build(:subscription_plan, name_key: "basic_monthly", price_cents: 9_99)
   end
 
   describe "validations" do

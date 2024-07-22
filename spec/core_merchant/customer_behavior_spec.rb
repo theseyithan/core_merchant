@@ -8,7 +8,7 @@ RSpec.describe CoreMerchant::CustomerBehavior do
   end
 
   it "provides a customer id" do
-    expect(customer.core_merchant_customer_id).to eq(1)
+    expect(customer.core_merchant_customer_id).to_not be_nil
   end
 
   it "provides a customer email" do

@@ -6,28 +6,12 @@ require "support/user"
 
 RSpec.describe CoreMerchant::Subscription do
   let(:subscription) do
-    CoreMerchant::Subscription.new(
-      customer: user,
-      subscription_plan: plan,
-      status: :pending,
-      start_date: 1.day.ago
-    )
-  end
-
-  let(:user) do
-    User.new(name: "John Doe", email: "john@example.com")
-  end
-
-  let(:plan) do
-    CoreMerchant::SubscriptionPlan.new(
-      name_key: "basic_monthly",
-      price_cents: 9_99,
-      duration: "1m"
-    )
+    build(:subscription)
   end
 
   describe "validations" do
     it "is valid with valid attributes" do
+      subscription.save
       expect(subscription).to be_valid
     end
 
