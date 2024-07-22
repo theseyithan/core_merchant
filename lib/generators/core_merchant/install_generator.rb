@@ -10,12 +10,8 @@ module CoreMerchant
 
       source_root File.expand_path("templates", __dir__)
 
-      class_option :customer_class, type: :string, required: true,
-                                    desc: "Name of your existing customer class, e.g. User"
-
       def copy_initializer
-        @customer_class = options[:customer_class].classify
-        template "core_merchant.erb", "config/initializers/core_merchant.rb"
+        template "core_merchant.rb", "config/initializers/core_merchant.rb"
       end
 
       def copy_locales
@@ -36,20 +32,22 @@ module CoreMerchant
 
       def show_post_install
         say "CoreMerchant has been successfully installed.", :green
-        say <<~MESSAGE
-          Customer class: #{@customer_class}. Please update this model to include the CoreMerchant::CustomerBehavior module.
+        next_steps = <<~MESSAGE
+          Next steps:
+          1. Set the customer class in the initializer file (config/initializers/core_merchant.rb) to the class you want to use for customers.
+          2. Create a subscription listener class (should include CoreMerchant::SubscriptionListener) in your app and set this class in the initializer file (config/initializers/core_merchant.rb) to the class you want to use for subscription listeners.
+          3. Run `rails db:migrate` to create the subscription and subscription plan tables.
         MESSAGE
-        say "Please run `rails db:migrate` to create the subscription and subscription plan tables.", :yellow
+        say next_steps, :yellow
       end
 
       def self.banner
-        "rails generate core_merchant:install --customer_class=User"
+        "rails generate core_merchant:install"
       end
 
       def self.description
         <<~DESC
-          Installs CoreMerchant into your application with the specified customer class.
-          This could be User, Customer, or any other existing model in your application that represents a customer."
+          Installs CoreMerchant into your application. This generator will create an initializer file, migration files for the subscription and subscription plan tables, and a locale file."
         DESC
       end
     end

@@ -10,7 +10,7 @@ RSpec.describe CoreMerchant::Generators::InstallGenerator, type: :generator do
 
   before do
     prepare_destination
-    run_generator ["--customer_class=TestUser"]
+    run_generator
   end
 
   after do
@@ -24,7 +24,7 @@ RSpec.describe CoreMerchant::Generators::InstallGenerator, type: :generator do
   it "creates the intializer file with the default content" do
     assert_file "config/initializers/core_merchant.rb" do |config|
       expect(config).to include("CoreMerchant.configure do |config|")
-      expect(config).to include("config.customer_class = \"TestUser\"")
+      expect(config).to include("config.customer_class = \"User\"")
       expect(config).to include("config.subscription_listener_class = \"SubscriptionListener\"")
     end
   end
