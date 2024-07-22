@@ -125,7 +125,5 @@ RSpec.describe CoreMerchant::Subscription do
       expect(subscription.canceled_at).to be_within(1.second).of(Time.current)
       expect(subscription.cancellation_reason).to eq("Too expensive")
     end
-
-    it ""
   end
 end

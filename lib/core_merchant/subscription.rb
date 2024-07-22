@@ -27,7 +27,6 @@ module CoreMerchant
   # **Attributes**:
   # - `customer`: Polymorphic association to the customer
   # - `subscription_plan`: The current plan for this subscription
-  # - `next_subscription_plan`: The plan to change to at next renewal (if any)
   # - `status`: Current status of the subscription (see enum definition)
   # - `start_date`: When the subscription started
   # - `end_date`: When the subscription ended (or will end)
@@ -37,6 +36,7 @@ module CoreMerchant
   # - `current_period_end`: End of the current billing period
   # - `pause_start_date`: When the subscription was paused
   # - `pause_end_date`: When the paused subscription will resume
+  # - `current_period_price_cents`: Price for the current period
   # - `next_renewal_price_cents`: Price for the next renewal (if different from plan)
   # - `cancellation_reason`: Reason for cancellation (if applicable)
   #

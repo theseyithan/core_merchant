@@ -27,8 +27,11 @@ module CoreMerchant
       end
 
       def create_migration_file
-        migration_template "create_core_merchant_subscription_plans.erb",
+        migration_template "migrate/create_core_merchant_subscription_plans.erb",
                            "db/migrate/create_core_merchant_subscription_plans.rb"
+
+        migration_template "migrate/create_core_merchant_subscriptions.erb",
+                           "db/migrate/create_core_merchant_subscriptions.rb"
       end
 
       def show_post_install
@@ -36,7 +39,7 @@ module CoreMerchant
         say <<~MESSAGE
           Customer class: #{@customer_class}. Please update this model to include the CoreMerchant::CustomerBehavior module.
         MESSAGE
-        say "Please run `rails db:migrate` to create the subscription plans table."
+        say "Please run `rails db:migrate` to create the subscription and subscription plan tables.", :yellow
       end
 
       def self.banner
