@@ -9,8 +9,8 @@ CoreMerchant is a library for customer, product, and subscription management in 
 - [X] Add customer behavior
 - [X] Add initializer generator
 - [X] Add SubscriptionPlan model
-- [ ] Add Subscription model
-- [ ] Add subscription management service
+- [X] Add Subscription model
+- [ ] Implement subscription manager and callbacks
 - [ ] Add sidekiq jobs for subscription management
 - [ ] Add Invoice model
 - [ ] Add billing and invoicing service
