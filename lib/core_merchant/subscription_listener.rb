@@ -5,7 +5,7 @@ module CoreMerchant
   module SubscriptionListener
     extend ActiveSupport::Concern
 
-    included do
+    included do # rubocop:disable Metrics/BlockLength
       def on_test_event_received
         puts "Test event received by CoreMerchant::SubscriptionListener. Override this method in your application."
       end
@@ -36,8 +36,16 @@ module CoreMerchant
         puts "Subscription (#{subscription.id}) has entered a grace period with #{days_remaining} days remaining. Override #{__method__} in your application to handle this event."
       end
 
-      def on_subscription_grace_period_exceeded(subscription)
-        puts "Subscription (#{subscription.id}) grace period has been exceeded. Override #{__method__} in your application to handle this event."
+      def on_subscription_renewed(subscription)
+        puts "Subscription (#{subscription.id}) renewed. Override #{__method__} in your application to handle this event."
+      end
+
+      def on_subscription_renewal_payment_processing(subscription)
+        puts "Subscription (#{subscription.id}) renewal payment processing. Override #{__method__} in your application to handle this event."
+      end
+
+      def on_subscription_expired(subscription)
+        puts "Subscription (#{subscription.id}) expired. Override #{__method__} in your application to handle this event."
       end
 
       # rubocop:enable Metrics/LineLength

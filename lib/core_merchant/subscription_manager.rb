@@ -26,7 +26,7 @@ module CoreMerchant
       @listeners << listener
     end
 
-    def notify(subscription, event, **options) # rubocop:disable Metrics/CyclomaticComplexity
+    def notify(subscription, event, **options) # rubocop:disable Metrics/CyclomaticComplexity,Metrics/MethodLength
       case event
       when :created
         notify_subscription_created(subscription)
