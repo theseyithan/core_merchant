@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require "core_merchant/concerns/subscription_state_machine"
+require "core_merchant/concerns/subscription_notifications"
 
 module CoreMerchant
   # Represents a subscription in CoreMerchant.
@@ -51,6 +52,7 @@ module CoreMerchant
   #   ```
   class Subscription < ActiveRecord::Base
     include CoreMerchant::Concerns::SubscriptionStateMachine
+    include CoreMerchant::Concerns::SubscriptionNotifications
 
     self.table_name = "core_merchant_subscriptions"
 
@@ -74,27 +76,39 @@ module CoreMerchant
     validate :end_date_after_start_date, if: :end_date
     validate :canceled_at_with_reason, if: :canceled_at
 
+    # Starts the subscription.
+    # Sets the current period start and end dates based on the plan's duration.
     def start
       new_period_start = start_date
       new_period_end = new_period_start + subscription_plan.duration_in_date
 
-      transition_to_active!
-      update!(
-        current_period_start: new_period_start,
-        current_period_end: new_period_end
-      )
+      transaction do
+        transition_to_active!
+        update!(
+          current_period_start: new_period_start,
+          current_period_end: new_period_end
+        )
+      end
     end
 
-    def cancel(reason:, at_period_end:)
-      if at_period_end
-        transition_to_pending_cancellation!
-      else
-        transition_to_canceled!
+    # Cancels the subscription.
+    # Parameters:
+    # - `reason`: Reason for cancellation
+    # - `at_period_end`: If true, the subscription will be canceled at the end of the current period.
+    #   Otherwise, the subscription will be canceled immediately.
+    #   Default is `true`.
+    def cancel(reason:, at_period_end: true)
+      transaction do
+        if at_period_end
+          transition_to_pending_cancellation!
+        else
+          transition_to_canceled!
+        end
+        update!(
+          canceled_at: at_period_end ? current_period_end : Time.current,
+          cancellation_reason: reason
+        )
       end
-      update!(
-        canceled_at: at_period_end ? current_period_end : Time.current,
-        cancellation_reason: reason
-      )
     end
 
     private

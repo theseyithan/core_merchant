@@ -2,6 +2,9 @@
 
 module CoreMerchant
   # Manages subscriptions in CoreMerchant.
+  # This class is responsible for notifying listeners when subscription events occur.
+  # Attributes:
+  #   - `listeners` - An array of listeners that will be notified when subscription events occur.
   class SubscriptionManager
     attr_reader :listeners
 
@@ -9,13 +12,42 @@ module CoreMerchant
       @listeners = []
     end
 
+    def check_subscriptions
+      # Check trial expirations
+      # Check expirations
+      # Check renewals
+    end
+
     def add_listener(listener)
       @listeners << listener
     end
 
+    def notify(subscription, event)
+      case event
+      when :created
+        notify_subscription_created(subscription)
+      when :destroyed
+        notify_subscription_destroyed(subscription)
+      end
+    end
+
     def notify_test_event
+      send_notification_to_listeners(nil, :on_test_event_received)
+    end
+
+    private
+
+    def notify_subscription_created(subscription)
+      send_notification_to_listeners(subscription, :on_subscription_created)
+    end
+
+    def notify_subscription_destroyed(subscription)
+      send_notification_to_listeners(subscription, :on_subscription_destroyed)
+    end
+
+    def send_notification_to_listeners(subscription, method_name)
       @listeners.each do |listener|
-        listener.on_test_event_received if listener.respond_to?(:on_test_event_received)
+        listener.send(method_name, subscription) if listener.respond_to?(method_name)
       end
     end
   end
