@@ -46,11 +46,8 @@ module CoreMerchant
   # **Usage**:
   #  ```ruby
   #   subscription = CoreMerchant::Subscription.create(customer: user, subscription_plan: plan, status: :active)
+  #   subscription.start
   #   subscription.cancel(reason: "Too expensive", at_period_end: true)
-  #   subscription.change_plan(new_plan, at_period_end: false)
-  #   subscription.pause(until_date: 1.month.from_now)
-  #   subscription.resume
-  #   subscription.renew(price_cents: 1999)
   #   ```
   class Subscription < ActiveRecord::Base
     include CoreMerchant::Concerns::SubscriptionStateMachine

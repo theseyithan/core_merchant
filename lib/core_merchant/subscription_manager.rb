@@ -4,9 +4,33 @@ require "core_merchant/concerns/subscription_manager_renewals"
 
 module CoreMerchant
   # Manages subscriptions in CoreMerchant.
-  # This class is responsible for notifying listeners when subscription events occur.
-  # Attributes:
+  # This class is responsible for notifying listeners when subscription events
+  # occur and checking for and handling renewals.
+  # **Attributes**:
   #   - `listeners` - An array of listeners that will be notified when subscription events occur.
+  #
+  # **Methods**:
+  #  - `check_subscriptions` - Checks all subscriptions for renewals
+  #  - `add_listener(listener)` - Adds a listener to the list of listeners
+  #  - `no_payment_needed_for_renewal(subscription)` - Handles the case where no payment is needed for a renewal.
+  #     Call when a subscription is renewed without payment.
+  #  - `processing_payment_for_renewal(subscription)` - Handles the case where payment is being processed for a renewal.
+  #     Call when payment is being processed for a renewal.
+  #  - `payment_successful_for_renewal(subscription)` - Handles the case where payment was successful for a renewal.
+  #     Call when payment was successful for a renewal.
+  #  - `payment_failed_for_renewal(subscription)` - Handles the case where payment failed for a renewal.
+  #     Call when payment failed for a renewal.
+  #
+  # **Usage**:
+  #  ```ruby
+  #  manager = CoreMerchant.subscription_manager
+  #  manager.check_subscriptions
+  #
+  #  # ... somewhere else in the code ...
+  #  manager.payment_successful_for_renewal(subscription1)
+  #  manager.payment_failed_for_renewal(subscription2)
+  #  ```
+  #
   class SubscriptionManager
     include Concerns::SubscriptionManagerRenewals
 
@@ -90,10 +114,6 @@ module CoreMerchant
         subscription, :on_subscription_grace_period_started,
         days_remaining: days_remaining
       )
-    end
-
-    def notify_subscription_grace_period_exceeded(subscription)
-      send_notification_to_listeners(subscription, :on_subscription_grace_period_exceeded)
     end
 
     def send_notification_to_listeners(subscription, method_name, **args)

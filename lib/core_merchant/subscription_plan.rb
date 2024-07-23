@@ -16,7 +16,7 @@ module CoreMerchant
   # - `introductory_price_cents`: The introductory price of the subscription plan in cents.
   # - `introductory_duration`: The duration of the introductory price of the subscription plan.
   #
-  # Example:
+  # Usage:
   #  ```
   #   plan = CoreMerchant::SubscriptionPlan.new(name_key: "basic_monthly", price_cents: 7_99)
   #   plan.save

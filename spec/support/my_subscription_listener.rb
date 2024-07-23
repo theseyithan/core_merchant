@@ -15,4 +15,14 @@ class MySubscriptionListener
   def on_subscription_started(subscription); end
 
   def on_subscription_canceled(subscription, reason:, immediate:); end
+
+  def on_subscription_due_for_renewal(subscription); end
+
+  def on_subscription_renewed(subscription); end
+
+  def on_subscription_renewal_payment_processing(subscription); end
+
+  def on_subscription_grace_period_started(subscription, days_remaining:); end
+
+  def on_subscription_expired(subscription); end
 end
