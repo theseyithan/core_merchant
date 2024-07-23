@@ -47,15 +47,9 @@ module CoreMerchant
   end
 
   # Default customer class in CoreMerchant. Use this class if you don't have a model for customers in your application.
-  class Customer
+  class Customer < ActiveRecord::Base
     include CustomerBehavior
 
     attr_accessor :id, :email, :name
-
-    def initialize(id:, email:, name: nil)
-      @id = id
-      @email = email
-      @name = name
-    end
   end
 end

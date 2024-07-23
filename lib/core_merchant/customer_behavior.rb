@@ -6,6 +6,8 @@ module CoreMerchant
     extend ActiveSupport::Concern
 
     included do
+      has_many :subscriptions, class_name: "CoreMerchant::Subscription", as: :customer, dependent: :destroy
+
       def core_merchant_customer_id
         id
       end
@@ -16,10 +18,6 @@ module CoreMerchant
 
       def core_merchant_customer_name
         name if respond_to?(:name)
-      end
-
-      def subscriptions
-        CoreMerchant::Subscription.where(customer_id: core_merchant_customer_id)
       end
     end
   end
