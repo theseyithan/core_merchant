@@ -137,21 +137,22 @@ module CoreMerchant
     end
 
     def in_grace_period?
-      past_due? && Time.current <= grace_period_end_date
+      due_for_renewal? && Time.current <= grace_period_end_date
     end
 
-    def grace_period_remaining_days
-      return 0 unless past_due?
+    def days_remaining_in_grace_period
+      return 0 unless due_for_renewal?
 
       (grace_period_end_date.to_date - Time.current.to_date).to_i
     end
 
     def grace_period_exceeded?
-      past_due? && Time.current > grace_period_end_date
+      due_for_renewal? && Time.current > grace_period_end_date
     end
 
     def due_for_renewal?
-      (active? || trial? || past_due?) && current_period_end <= Time.current
+      (active? || trial? || past_due? || processing_renewal? || processing_payment?) &&
+        current_period_end <= Time.current
     end
 
     private

@@ -96,6 +96,7 @@ RSpec.describe CoreMerchant::SubscriptionManager do
 
     it "sets subscription to past due when payment fails and in grace period" do
       subscription.status = :processing_payment
+      subscription.current_period_end = Time.current
 
       expect(subscription).to receive(:in_grace_period?).and_return(true)
       expect(subscription).to receive(:transition_to_past_due).and_call_original

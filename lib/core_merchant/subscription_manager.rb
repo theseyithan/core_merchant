@@ -17,9 +17,7 @@ module CoreMerchant
     end
 
     def check_subscriptions
-      # Check trial expirations
-      # Check expirations
-      # Check renewals
+      check_renewals
     end
 
     def add_listener(listener)

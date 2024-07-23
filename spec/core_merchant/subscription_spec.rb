@@ -117,7 +117,7 @@ RSpec.describe CoreMerchant::Subscription do
     it "returns remaining days in grace period" do
       subscription.status = :past_due
       travel_to subscription.current_period_end + 2.days
-      expect(subscription.grace_period_remaining_days).to eq(1)
+      expect(subscription.days_remaining_in_grace_period).to eq(1)
     end
 
     it "returns grace_period_exceeded? correctly" do

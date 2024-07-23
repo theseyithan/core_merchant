@@ -41,6 +41,7 @@ module CoreMerchant
           is_in_grace_period = subscription.in_grace_period?
           if is_in_grace_period
             subscription.transition_to_past_due
+            notify(subscription, :grace_period_started, days_remaining: subscription.days_remaining_in_grace_period)
           else
             subscription.transition_to_expired
             notify(subscription, :expired)
