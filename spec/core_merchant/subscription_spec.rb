@@ -5,6 +5,8 @@ require "core_merchant/subscription"
 require "support/user"
 
 RSpec.describe CoreMerchant::Subscription do
+  include ActiveSupport::Testing::TimeHelpers
+
   let(:subscription) do
     build(:subscription)
   end
@@ -84,6 +86,11 @@ RSpec.describe CoreMerchant::Subscription do
   end
 
   describe "calculate attributes" do
+    it "calculates the days remaining in the current period" do
+      subscription.start
+      travel_to 10.days.from_now
+      expect(subscription.days_remaining_in_current_period).to eq(20)
+    end
   end
 
   describe "logic" do

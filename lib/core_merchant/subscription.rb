@@ -115,6 +115,13 @@ module CoreMerchant
       notify_subscription_manager(:canceled, reason: reason, immediate: !at_period_end)
     end
 
+    # Returns the days remaining in the current period.
+    # Use to show the user how many days are left before the next renewal or
+    # to refund pro-rated amounts for early cancellations.
+    def days_remaining_in_current_period
+      (current_period_end.to_date - Time.current.to_date).to_i
+    end
+
     private
 
     def end_date_after_start_date
