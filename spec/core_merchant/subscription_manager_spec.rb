@@ -56,5 +56,23 @@ RSpec.describe CoreMerchant::SubscriptionManager do
       expect(listener).to receive(:on_subscription_canceled).with(subscription, reason: "test", immediate: true)
       manager.notify(subscription, :canceled, reason: "test", immediate: true)
     end
+
+    it "sends the subscription due for renewal event" do
+      subscription = double("subscription")
+      expect(listener).to receive(:on_subscription_due_for_renewal).with(subscription)
+      manager.notify(subscription, :due_for_renewal)
+    end
+
+    it "sends the subscription grace period started event" do
+      subscription = double("subscription")
+      expect(listener).to receive(:on_subscription_grace_period_started).with(subscription, days_remaining: 5)
+      manager.notify(subscription, :grace_period_started, days_remaining: 5)
+    end
+
+    it "sends the subscription grace period exceeded event" do
+      subscription = double("subscription")
+      expect(listener).to receive(:on_subscription_grace_period_exceeded).with(subscription)
+      manager.notify(subscription, :grace_period_exceeded)
+    end
   end
 end

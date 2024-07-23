@@ -86,10 +86,46 @@ RSpec.describe CoreMerchant::Subscription do
   end
 
   describe "calculate attributes" do
-    it "calculates the days remaining in the current period" do
+    before do
       subscription.start
+    end
+
+    it "calculates the days remaining in the current period" do
       travel_to 10.days.from_now
       expect(subscription.days_remaining_in_current_period).to eq(20)
+    end
+
+    it "returns grace period" do
+      expect(subscription.grace_period).to eq(3.days)
+    end
+
+    it "returns the end of the grace period" do
+      expect(subscription.grace_period_end_date).to be_within(1.second).of(subscription.current_period_end + 3.days)
+    end
+
+    it "returns in_grace_period? correctly" do
+      expect(subscription.in_grace_period?).to eq(false)
+
+      subscription.status = :past_due
+      travel_to subscription.current_period_end + 2.days
+      expect(subscription.in_grace_period?).to eq(true)
+
+      travel_to subscription.current_period_end + 4.days
+      expect(subscription.in_grace_period?).to eq(false)
+    end
+
+    it "returns remaining days in grace period" do
+      subscription.status = :past_due
+      travel_to subscription.current_period_end + 2.days
+      expect(subscription.grace_period_remaining_days).to eq(1)
+    end
+
+    it "returns grace_period_exceeded? correctly" do
+      expect(subscription.grace_period_exceeded?).to eq(false)
+
+      subscription.status = :past_due
+      travel_to subscription.current_period_end + 4.days
+      expect(subscription.grace_period_exceeded?).to eq(true)
     end
   end
 

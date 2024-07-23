@@ -11,7 +11,7 @@ module CoreMerchant
   # - `pending`: Subscription created but not yet started
   # - `trial`: In a trial period
   # - `active`: Currently active and paid
-  # - `past_due`: Payment failed but in grace period, not yet implemented
+  # - `past_due`: Payment failed but in grace period
   # - `pending_cancellation`: Will be canceled at period end
   # - `canceled`: Canceled by user or due to payment failure
   # - `expired`: Subscription period ended
@@ -63,7 +63,7 @@ module CoreMerchant
       pending: 0,
       trial: 1,
       active: 2,
-      past_due: 3, # Logic not yet implemented
+      past_due: 3,
       pending_cancellation: 4,
       canceled: 5,
       expired: 6,
@@ -120,6 +120,30 @@ module CoreMerchant
     # to refund pro-rated amounts for early cancellations.
     def days_remaining_in_current_period
       (current_period_end.to_date - Time.current.to_date).to_i
+    end
+
+    # Returns the number of days as a grace period for past-due subscriptions.
+    # By default, this is 3 days.
+    def grace_period
+      3.days
+    end
+
+    def grace_period_end_date
+      current_period_end + grace_period
+    end
+
+    def in_grace_period?
+      past_due? && Time.current <= grace_period_end_date
+    end
+
+    def grace_period_remaining_days
+      return 0 unless past_due?
+
+      (grace_period_end_date.to_date - Time.current.to_date).to_i
+    end
+
+    def grace_period_exceeded?
+      past_due? && Time.current > grace_period_end_date
     end
 
     private

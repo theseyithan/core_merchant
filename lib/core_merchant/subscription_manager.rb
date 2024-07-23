@@ -22,7 +22,7 @@ module CoreMerchant
       @listeners << listener
     end
 
-    def notify(subscription, event, **options)
+    def notify(subscription, event, **options) # rubocop:disable Metrics/CyclomaticComplexity
       case event
       when :created
         notify_subscription_created(subscription)
@@ -32,6 +32,12 @@ module CoreMerchant
         notify_subscription_started(subscription)
       when :canceled
         notify_subscription_canceled(subscription, options[:reason], options[:immediate])
+      when :due_for_renewal
+        notify_subscription_due_for_renewal(subscription)
+      when :grace_period_started
+        notify_subscription_grace_period_started(subscription, options[:days_remaining])
+      when :grace_period_exceeded
+        notify_subscription_grace_period_exceeded(subscription)
       end
     end
 
@@ -55,6 +61,21 @@ module CoreMerchant
 
     def notify_subscription_canceled(subscription, reason, immediate)
       send_notification_to_listeners(subscription, :on_subscription_canceled, reason: reason, immediate: immediate)
+    end
+
+    def notify_subscription_due_for_renewal(subscription)
+      send_notification_to_listeners(subscription, :on_subscription_due_for_renewal)
+    end
+
+    def notify_subscription_grace_period_started(subscription, days_remaining)
+      send_notification_to_listeners(
+        subscription, :on_subscription_grace_period_started,
+        days_remaining: days_remaining
+      )
+    end
+
+    def notify_subscription_grace_period_exceeded(subscription)
+      send_notification_to_listeners(subscription, :on_subscription_grace_period_exceeded)
     end
 
     def send_notification_to_listeners(subscription, method_name, **args)
