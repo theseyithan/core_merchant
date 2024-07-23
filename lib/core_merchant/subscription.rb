@@ -13,6 +13,8 @@ module CoreMerchant
   # - `active`: Currently active and paid
   # - `past_due`: Payment failed but in grace period
   # - `pending_cancellation`: Will be canceled at period end
+  # - `processing_renewal`: Renewal in progress
+  # - `processing_payment`: Payment processing
   # - `canceled`: Canceled by user or due to payment failure
   # - `expired`: Subscription period ended
   # - `paused`: Temporarily halted, not yet implemented
@@ -63,12 +65,14 @@ module CoreMerchant
       pending: 0,
       trial: 1,
       active: 2,
-      past_due: 3,
-      pending_cancellation: 4,
-      canceled: 5,
-      expired: 6,
-      paused: 7, # Logic not yet implemented
-      pending_change: 8 # Logic not yet implemented
+      past_due: 10,
+      pending_cancellation: 11,
+      processing_renewal: 20,
+      processing_payment: 21,
+      canceled: 30,
+      expired: 31,
+      paused: 40, # Logic not yet implemented
+      pending_change: 50 # Logic not yet implemented
     }
 
     validates :customer, :subscription_plan, :status, :start_date, presence: true
