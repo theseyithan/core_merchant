@@ -22,12 +22,16 @@ module CoreMerchant
       @listeners << listener
     end
 
-    def notify(subscription, event)
+    def notify(subscription, event, **options)
       case event
       when :created
         notify_subscription_created(subscription)
       when :destroyed
         notify_subscription_destroyed(subscription)
+      when :started
+        notify_subscription_started(subscription)
+      when :canceled
+        notify_subscription_canceled(subscription, options[:reason], options[:immediate])
       end
     end
 
@@ -45,9 +49,17 @@ module CoreMerchant
       send_notification_to_listeners(subscription, :on_subscription_destroyed)
     end
 
-    def send_notification_to_listeners(subscription, method_name)
+    def notify_subscription_started(subscription)
+      send_notification_to_listeners(subscription, :on_subscription_started)
+    end
+
+    def notify_subscription_canceled(subscription, reason, immediate)
+      send_notification_to_listeners(subscription, :on_subscription_canceled, reason: reason, immediate: immediate)
+    end
+
+    def send_notification_to_listeners(subscription, method_name, **args)
       @listeners.each do |listener|
-        listener.send(method_name, subscription) if listener.respond_to?(method_name)
+        listener.send(method_name, subscription, **args) if listener.respond_to?(method_name)
       end
     end
   end

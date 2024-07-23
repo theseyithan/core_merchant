@@ -89,6 +89,8 @@ module CoreMerchant
           current_period_end: new_period_end
         )
       end
+
+      notify_subscription_manager(:started)
     end
 
     # Cancels the subscription.
@@ -109,6 +111,8 @@ module CoreMerchant
           cancellation_reason: reason
         )
       end
+
+      notify_subscription_manager(:canceled, reason: reason, immediate: !at_period_end)
     end
 
     private

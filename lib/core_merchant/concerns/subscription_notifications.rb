@@ -14,8 +14,8 @@ module CoreMerchant
         after_create { notify_subscription_manager(:created) }
         after_destroy { notify_subscription_manager(:destroyed) }
 
-        def notify_subscription_manager(event)
-          CoreMerchant.subscription_manager.notify(self, event)
+        def notify_subscription_manager(event, **options)
+          CoreMerchant.subscription_manager.notify(self, event, **options)
         end
       end
     end
