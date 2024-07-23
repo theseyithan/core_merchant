@@ -127,6 +127,24 @@ RSpec.describe CoreMerchant::Subscription do
       travel_to subscription.current_period_end + 4.days
       expect(subscription.grace_period_exceeded?).to eq(true)
     end
+
+    it "returns due_for_renewal? true for active subscriptions past subscription period end" do
+      subscription.status = :active
+      travel_to subscription.current_period_end + 1.day
+      expect(subscription.due_for_renewal?).to eq(true)
+    end
+
+    it "returns due_for_renewal? false for active subscriptions before subscription period end" do
+      subscription.status = :active
+      travel_to subscription.current_period_end - 1.day
+      expect(subscription.due_for_renewal?).to eq(false)
+    end
+
+    it "returns due_for_renewal? correctly for past due subscriptions" do
+      subscription.status = :past_due
+      travel_to subscription.current_period_end + 1.day
+      expect(subscription.due_for_renewal?).to eq(true)
+    end
   end
 
   describe "logic" do

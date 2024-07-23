@@ -150,6 +150,10 @@ module CoreMerchant
       past_due? && Time.current > grace_period_end_date
     end
 
+    def due_for_renewal?
+      (active? || trial? || past_due?) && current_period_end <= Time.current
+    end
+
     private
 
     def end_date_after_start_date

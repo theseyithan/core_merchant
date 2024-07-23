@@ -1,11 +1,15 @@
 # frozen_string_literal: true
 
+require "core_merchant/concerns/subscription_manager_renewals"
+
 module CoreMerchant
   # Manages subscriptions in CoreMerchant.
   # This class is responsible for notifying listeners when subscription events occur.
   # Attributes:
   #   - `listeners` - An array of listeners that will be notified when subscription events occur.
   class SubscriptionManager
+    include Concerns::SubscriptionManagerRenewals
+
     attr_reader :listeners
 
     def initialize
@@ -34,10 +38,14 @@ module CoreMerchant
         notify_subscription_canceled(subscription, options[:reason], options[:immediate])
       when :due_for_renewal
         notify_subscription_due_for_renewal(subscription)
+      when :renewed
+        notify_subscription_renewed(subscription)
+      when :renewal_payment_processing
+        notify_subscription_renewal_payment_processing(subscription)
       when :grace_period_started
         notify_subscription_grace_period_started(subscription, options[:days_remaining])
-      when :grace_period_exceeded
-        notify_subscription_grace_period_exceeded(subscription)
+      when :expired
+        notify_subscription_expired(subscription)
       end
     end
 
@@ -65,6 +73,18 @@ module CoreMerchant
 
     def notify_subscription_due_for_renewal(subscription)
       send_notification_to_listeners(subscription, :on_subscription_due_for_renewal)
+    end
+
+    def notify_subscription_renewed(subscription)
+      send_notification_to_listeners(subscription, :on_subscription_renewed)
+    end
+
+    def notify_subscription_renewal_payment_processing(subscription)
+      send_notification_to_listeners(subscription, :on_subscription_renewal_payment_processing)
+    end
+
+    def notify_subscription_expired(subscription)
+      send_notification_to_listeners(subscription, :on_subscription_expired)
     end
 
     def notify_subscription_grace_period_started(subscription, days_remaining)

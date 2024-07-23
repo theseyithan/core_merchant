@@ -63,16 +63,28 @@ RSpec.describe CoreMerchant::SubscriptionManager do
       manager.notify(subscription, :due_for_renewal)
     end
 
+    it "sends the subscription renewed event" do
+      subscription = double("subscription")
+      expect(listener).to receive(:on_subscription_renewed).with(subscription)
+      manager.notify(subscription, :renewed)
+    end
+
+    it "sends the subscription renewal payment processing event" do
+      subscription = double("subscription")
+      expect(listener).to receive(:on_subscription_renewal_payment_processing).with(subscription)
+      manager.notify(subscription, :renewal_payment_processing)
+    end
+
     it "sends the subscription grace period started event" do
       subscription = double("subscription")
       expect(listener).to receive(:on_subscription_grace_period_started).with(subscription, days_remaining: 5)
       manager.notify(subscription, :grace_period_started, days_remaining: 5)
     end
 
-    it "sends the subscription grace period exceeded event" do
+    it "sends the subscription expired" do
       subscription = double("subscription")
-      expect(listener).to receive(:on_subscription_grace_period_exceeded).with(subscription)
-      manager.notify(subscription, :grace_period_exceeded)
+      expect(listener).to receive(:on_subscription_expired).with(subscription)
+      manager.notify(subscription, :expired)
     end
   end
 end
