@@ -57,8 +57,8 @@ RSpec.describe CoreMerchant do
 
       subscription.reload
 
-      # expect(subscription).to be_active
-      # expect(subscription.current_period_start).to eq(Date.today)
+      expect(subscription).to be_active
+      expect(subscription.current_period_start).to eq(Date.today)
     end
 
     it "goes through the renewal process when payment is successful" do
@@ -87,6 +87,10 @@ RSpec.describe CoreMerchant do
       end
 
       CoreMerchant.subscription_manager.check_subscriptions
+
+      subscription.reload
+
+      expect(subscription).to be_past_due, "Subscription should be past due but is #{subscription.status}"
     end
 
     it "counts down grace period days" do
@@ -100,6 +104,11 @@ RSpec.describe CoreMerchant do
 
       travel_to subscription.current_period_end + 1.day
       CoreMerchant.subscription_manager.check_subscriptions
+
+      subscription.reload
+
+      expect(subscription).to be_past_due, "Subscription should be past due but is #{subscription.status}"
+      expect(subscription.days_remaining_in_grace_period).to eq(2)
     end
 
     it "expires subscription when grace period is exceeded" do
@@ -115,6 +124,11 @@ RSpec.describe CoreMerchant do
 
       travel_to subscription.current_period_end + 4.days
       CoreMerchant.subscription_manager.check_subscriptions
+
+      subscription.reload
+
+      expect(subscription).to be_expired, "Subscription should be expired but is #{subscription.status}"
+      expect(subscription.days_remaining_in_grace_period).to eq(0)
     end
   end
 end
