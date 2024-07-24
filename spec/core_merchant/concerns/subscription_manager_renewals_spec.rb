@@ -10,11 +10,15 @@ RSpec.describe CoreMerchant::SubscriptionManager do
   end
 
   let(:subscription) do
-    build(:subscription)
+    build(:subscription, subscription_plan: subscription_plan, status: :pending)
   end
 
   let(:subscription_plan) do
     build(:subscription_plan, name_key: "basic_monthly")
+  end
+
+  before do
+    subscription.start
   end
 
   describe "renewals concern" do
@@ -31,7 +35,7 @@ RSpec.describe CoreMerchant::SubscriptionManager do
         .to receive(:find_each).and_call_original
 
       expect(subscription_manager)
-        .to receive(:process_for_renewal).exactly(3).times
+        .to receive(:process_for_renewal).exactly(4).times
 
       subscription_manager.check_renewals
     end

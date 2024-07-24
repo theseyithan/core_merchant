@@ -86,8 +86,8 @@ module CoreMerchant
       transaction do
         transition_to_active!
         update!(
-          current_period_start: new_period_start,
-          current_period_end: new_period_end
+          current_period_start: new_period_start.to_date,
+          current_period_end: new_period_end.to_date
         )
       end
 
@@ -114,6 +114,18 @@ module CoreMerchant
       end
 
       notify_subscription_manager(:canceled, reason: reason, immediate: !at_period_end)
+    end
+
+    # Starts a new period for the subscription.
+    # This is called by SubscriptionManager when a subscription renewal is successful.
+    def start_new_period
+      new_period_start = current_period_end
+      new_period_end = new_period_start + subscription_plan.duration_in_date
+
+      update!(
+        current_period_start: new_period_start.to_date,
+        current_period_end: new_period_end.to_date
+      )
     end
 
     # Returns the days remaining in the current period.

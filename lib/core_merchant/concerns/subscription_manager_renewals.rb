@@ -20,9 +20,7 @@ module CoreMerchant
         end
 
         def no_payment_needed_for_renewal(subscription)
-          return unless subscription.transition_to_active
-
-          notify(subscription, :renewed)
+          renew_subscription(subscription)
         end
 
         def processing_payment_for_renewal(subscription)
@@ -32,9 +30,7 @@ module CoreMerchant
         end
 
         def payment_successful_for_renewal(subscription)
-          return unless subscription.transition_to_active
-
-          notify(subscription, :renewed)
+          renew_subscription(subscription)
         end
 
         def payment_failed_for_renewal(subscription)
@@ -46,6 +42,15 @@ module CoreMerchant
             subscription.transition_to_expired
             notify(subscription, :expired)
           end
+        end
+
+        private
+
+        def renew_subscription(subscription)
+          return unless subscription.transition_to_active
+
+          subscription.start_new_period
+          notify(subscription, :renewed)
         end
       end
     end

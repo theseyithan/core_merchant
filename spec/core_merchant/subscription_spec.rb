@@ -151,15 +151,15 @@ RSpec.describe CoreMerchant::Subscription do
     it "starts the subscription" do
       subscription.start
       expect(subscription).to be_active
-      expect(subscription.current_period_start).to be_within(1.second).of(1.day.ago)
-      expect(subscription.current_period_end).to be_within(1.second).of(1.day.ago + 1.month)
+      expect(subscription.current_period_start).to eq(Date.yesterday)
+      expect(subscription.current_period_end).to eq(Date.yesterday + 1.month)
     end
 
     it "cancels the subscription at period end" do
       subscription.start
       subscription.cancel(reason: "Too expensive", at_period_end: true)
       expect(subscription).to be_pending_cancellation
-      expect(subscription.canceled_at).to be_within(1.second).of(1.day.ago + 1.month)
+      expect(subscription.canceled_at).to eq(Date.yesterday + 1.month)
       expect(subscription.cancellation_reason).to eq("Too expensive")
     end
 
@@ -169,6 +169,15 @@ RSpec.describe CoreMerchant::Subscription do
       expect(subscription).to be_canceled
       expect(subscription.canceled_at).to be_within(1.second).of(Time.current)
       expect(subscription.cancellation_reason).to eq("Too expensive")
+    end
+
+    it "starts a new period" do
+      subscription.start
+      travel_to subscription.current_period_end
+      subscription.start_new_period
+
+      expect(subscription.current_period_start).to eq(Date.today)
+      expect(subscription.current_period_end).to eq(Date.today + 1.month)
     end
   end
 end

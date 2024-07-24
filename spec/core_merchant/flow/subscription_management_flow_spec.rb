@@ -12,13 +12,24 @@ RSpec.describe CoreMerchant do
       create(
         :subscription,
         subscription_plan: subscription_plan,
-        status: :active,
-        start_date: 1.month.ago,
-        current_period_end: Time.current
+        status: :pending,
+        start_date: 1.month.ago
+      )
+    end
+
+    let(:other_subscription) do
+      create(
+        :subscription,
+        subscription_plan: subscription_plan,
+        status: :pending,
+        start_date: Date.yesterday
       )
     end
 
     before do
+      subscription.start
+      other_subscription.start
+
       CoreMerchant.subscription_manager.add_listener(MySubscriptionListener.new)
     end
 
@@ -27,7 +38,11 @@ RSpec.describe CoreMerchant do
     end
 
     it "notifies listeners when a subscription is due for renewal" do
-      expect_any_instance_of(MySubscriptionListener).to receive(:on_subscription_due_for_renewal).with(subscription)
+      expect_any_instance_of(MySubscriptionListener)
+        .to receive(:on_subscription_due_for_renewal).with(subscription)
+      expect_any_instance_of(MySubscriptionListener)
+        .to_not receive(:on_subscription_due_for_renewal).with(other_subscription)
+
       CoreMerchant.subscription_manager.check_subscriptions
     end
 
@@ -39,6 +54,11 @@ RSpec.describe CoreMerchant do
       end
 
       CoreMerchant.subscription_manager.check_subscriptions
+
+      subscription.reload
+
+      # expect(subscription).to be_active
+      # expect(subscription.current_period_start).to eq(Date.today)
     end
 
     it "goes through the renewal process when payment is successful" do
