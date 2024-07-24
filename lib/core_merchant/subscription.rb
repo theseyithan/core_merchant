@@ -49,7 +49,7 @@ module CoreMerchant
   #   subscription.start
   #   subscription.cancel(reason: "Too expensive", at_period_end: true)
   #   ```
-  class Subscription < ActiveRecord::Base
+  class Subscription < ActiveRecord::Base # rubocop:disable Metrics/ClassLength
     include CoreMerchant::Concerns::SubscriptionStateMachine
     include CoreMerchant::Concerns::SubscriptionNotifications
 
