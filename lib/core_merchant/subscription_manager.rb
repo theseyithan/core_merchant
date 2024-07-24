@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require "core_merchant/concerns/subscription_manager_renewals"
+require "core_merchant/concerns/subscription_manager_notifications"
 
 module CoreMerchant
   # Manages subscriptions in CoreMerchant.
@@ -32,7 +32,7 @@ module CoreMerchant
   #  ```
   #
   class SubscriptionManager
-    include Concerns::SubscriptionManagerRenewals
+    include Concerns::SubscriptionManagerNotifications
 
     attr_reader :listeners
 
@@ -49,72 +49,62 @@ module CoreMerchant
       @listeners << listener
     end
 
-    def notify(subscription, event, **options) # rubocop:disable Metrics/CyclomaticComplexity,Metrics/MethodLength
-      case event
-      when :created
-        notify_subscription_created(subscription)
-      when :destroyed
-        notify_subscription_destroyed(subscription)
-      when :started
-        notify_subscription_started(subscription)
-      when :canceled
-        notify_subscription_canceled(subscription, options[:reason], options[:immediate])
-      when :due_for_renewal
-        notify_subscription_due_for_renewal(subscription)
-      when :renewed
-        notify_subscription_renewed(subscription)
-      when :renewal_payment_processing
-        notify_subscription_renewal_payment_processing(subscription)
-      when :grace_period_started
-        notify_subscription_grace_period_started(subscription, options[:days_remaining])
-      when :expired
-        notify_subscription_expired(subscription)
+    def check_renewals
+      Subscription.find_each do |subscription|
+        process_for_renewal(subscription) if subscription.due_for_renewal?
       end
     end
 
-    def notify_test_event
-      send_notification_to_listeners(nil, :on_test_event_received)
+    def process_for_renewal(subscription)
+      return unless subscription.transition_to_processing_renewal
+
+      notify(subscription, :due_for_renewal)
+    end
+
+    def no_payment_needed_for_renewal(subscription)
+      renew_subscription(subscription)
+    end
+
+    def processing_payment_for_renewal(subscription)
+      return unless subscription.transition_to_processing_payment
+
+      notify(subscription, :renewal_payment_processing)
+    end
+
+    def payment_successful_for_renewal(subscription)
+      renew_subscription(subscription)
+    end
+
+    def payment_failed_for_renewal(subscription)
+      is_in_grace_period = subscription.in_grace_period?
+      if is_in_grace_period
+        subscription.transition_to_past_due
+        notify(subscription, :grace_period_started, days_remaining: subscription.days_remaining_in_grace_period)
+      else
+        subscription.transition_to_expired
+        notify(subscription, :expired)
+      end
+    end
+
+    def check_cancellations
+      Subscription.find_each do |subscription|
+        process_for_cancellation(subscription) if subscription.pending_cancellation?
+      end
+    end
+
+    def process_for_cancellation(subscription)
+      return unless subscription.transition_to_expired
+
+      notify(subscription, :expired)
     end
 
     private
 
-    def notify_subscription_created(subscription)
-      send_notification_to_listeners(subscription, :on_subscription_created)
-    end
+    def renew_subscription(subscription)
+      return unless subscription.transition_to_active
 
-    def notify_subscription_destroyed(subscription)
-      send_notification_to_listeners(subscription, :on_subscription_destroyed)
-    end
-
-    def notify_subscription_started(subscription)
-      send_notification_to_listeners(subscription, :on_subscription_started)
-    end
-
-    def notify_subscription_canceled(subscription, reason, immediate)
-      send_notification_to_listeners(subscription, :on_subscription_canceled, reason: reason, immediate: immediate)
-    end
-
-    def notify_subscription_due_for_renewal(subscription)
-      send_notification_to_listeners(subscription, :on_subscription_due_for_renewal)
-    end
-
-    def notify_subscription_renewed(subscription)
-      send_notification_to_listeners(subscription, :on_subscription_renewed)
-    end
-
-    def notify_subscription_renewal_payment_processing(subscription)
-      send_notification_to_listeners(subscription, :on_subscription_renewal_payment_processing)
-    end
-
-    def notify_subscription_expired(subscription)
-      send_notification_to_listeners(subscription, :on_subscription_expired)
-    end
-
-    def notify_subscription_grace_period_started(subscription, days_remaining)
-      send_notification_to_listeners(
-        subscription, :on_subscription_grace_period_started,
-        days_remaining: days_remaining
-      )
+      subscription.start_new_period
+      notify(subscription, :renewed)
     end
 
     def send_notification_to_listeners(subscription, method_name, **args)
