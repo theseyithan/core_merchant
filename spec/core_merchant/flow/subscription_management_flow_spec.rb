@@ -130,5 +130,18 @@ RSpec.describe CoreMerchant do
       expect(subscription).to be_expired, "Subscription should be expired but is #{subscription.status}"
       expect(subscription.days_remaining_in_grace_period).to eq(0)
     end
+
+    it "cancels subscriptions that are pending cancellation" do
+      subscription.cancel(reason: "I don't need this anymore", at_period_end: true)
+
+      expect_any_instance_of(MySubscriptionListener)
+        .to receive(:on_subscription_expired).with(subscription)
+
+      CoreMerchant.subscription_manager.check_subscriptions
+
+      subscription.reload
+
+      expect(subscription).to be_expired, "Subscription should be expired but is #{subscription.status}"
+    end
   end
 end

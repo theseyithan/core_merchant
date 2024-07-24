@@ -44,6 +44,18 @@ module CoreMerchant
           end
         end
 
+        def check_cancellations
+          Subscription.find_each do |subscription|
+            process_for_cancellation(subscription) if subscription.pending_cancellation?
+          end
+        end
+
+        def process_for_cancellation(subscription)
+          return unless subscription.transition_to_expired
+
+          notify(subscription, :expired)
+        end
+
         private
 
         def renew_subscription(subscription)

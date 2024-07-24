@@ -140,10 +140,51 @@ RSpec.describe CoreMerchant::Subscription do
       expect(subscription.due_for_renewal?).to eq(false)
     end
 
-    it "returns due_for_renewal? correctly for past due subscriptions" do
+    it "returns due_for_renewal? true for past due subscriptions" do
       subscription.status = :past_due
       travel_to subscription.current_period_end + 1.day
       expect(subscription.due_for_renewal?).to eq(true)
+    end
+
+    it "returns due_for_renewal? false for expired subscriptions" do
+      subscription.status = :expired
+      travel_to subscription.current_period_end + 1.day
+      expect(subscription.due_for_renewal?).to eq(false)
+    end
+
+    it "returns expired_or_canceled? true for expired subscriptions" do
+      subscription.status = :expired
+      expect(subscription.expired_or_canceled?).to eq(true)
+    end
+
+    it "returns expired_or_canceled? true for canceled subscriptions" do
+      subscription.status = :canceled
+      expect(subscription.expired_or_canceled?).to eq(true)
+    end
+
+    it "returns expired_or_canceled? false for active subscriptions" do
+      subscription.status = :active
+      expect(subscription.expired_or_canceled?).to eq(false)
+    end
+
+    it "returns processing? true for renewal processing subscriptions" do
+      subscription.status = :processing_renewal
+      expect(subscription.processing?).to eq(true)
+    end
+
+    it "returns processing? true for payment processing subscriptions" do
+      subscription.status = :processing_payment
+      expect(subscription.processing?).to eq(true)
+    end
+
+    it "returns processing? false for active subscriptions" do
+      subscription.status = :active
+      expect(subscription.processing?).to eq(false)
+    end
+
+    it "returns processing? false for expired subscriptions" do
+      subscription.status = :expired
+      expect(subscription.processing?).to eq(false)
     end
   end
 

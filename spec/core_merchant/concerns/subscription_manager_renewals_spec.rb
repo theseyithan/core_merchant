@@ -109,5 +109,15 @@ RSpec.describe CoreMerchant::SubscriptionManager do
 
       expect(subscription).to be_past_due, "Subscription should be past due but is #{subscription.status}"
     end
+
+    it "cancels pending_cancellation subscription at the end of the current period" do
+      subscription.status = :pending_cancellation
+
+      expect(subscription).to receive(:transition_to_expired).and_call_original
+
+      subscription_manager.process_for_cancellation(subscription)
+
+      expect(subscription).to be_expired, "Subscription should be canceled but is #{subscription.status}"
+    end
   end
 end

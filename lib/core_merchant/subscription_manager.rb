@@ -42,6 +42,7 @@ module CoreMerchant
 
     def check_subscriptions
       check_renewals
+      check_cancellations
     end
 
     def add_listener(listener)
