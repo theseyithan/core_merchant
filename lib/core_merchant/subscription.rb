@@ -77,6 +77,11 @@ module CoreMerchant
     validate :end_date_after_start_date, if: :end_date
     validate :canceled_at_with_reason, if: :canceled_at
 
+    scope :due_for_renewal, lambda {
+                              where(status: %i[active trial past_due processing_renewal processing_payment])
+                                .where("current_period_end <= ?", Time.current)
+                            }
+
     # Starts the subscription.
     # Sets the current period start and end dates based on the plan's duration.
     def start

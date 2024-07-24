@@ -180,4 +180,21 @@ RSpec.describe CoreMerchant::Subscription do
       expect(subscription.current_period_end).to eq(Date.today + 1.month)
     end
   end
+
+  describe "scopes" do
+    it "returns subscriptions due for renewal" do
+      plan = create(:subscription_plan, duration: "1m")
+
+      3.times do
+        create(:subscription, start_date: Date.yesterday, subscription_plan: plan).start
+      end
+
+      3.times do
+        create(:subscription, start_date: Date.today + 1.week, subscription_plan: plan).start
+      end
+
+      travel_to Date.today + 1.month
+      expect(CoreMerchant::Subscription.due_for_renewal.count).to eq(3)
+    end
+  end
 end
