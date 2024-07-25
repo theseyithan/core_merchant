@@ -36,10 +36,11 @@ CoreMerchant is a library for customer, product, and subscription management in 
     - [SubscriptionPlan](#subscriptionplan)
     - [Subscription](#subscription)
     - [SubscriptionEvent](#subscriptionevent)
-    - [Additional fields](#additional-fields)
-      - [SubscriptionRenewalEvent](#subscriptionrenewalevent)
-      - [SubscriptionStatusChangeEvent](#subscriptionstatuschangeevent)
-      - [SubscriptionPlanChangeEvent](#subscriptionplanchangeevent)
+      - [Subclasses](#subclasses)
+        - [SubscriptionRenewalEvent](#subscriptionrenewalevent)
+        - [SubscriptionStatusChangeEvent](#subscriptionstatuschangeevent)
+        - [SubscriptionPlanChangeEvent](#subscriptionplanchangeevent)
+        - [SubscriptionCancellationEvent](#subscriptioncancellationevent)
   - [Contributing](#contributing)
 
 
@@ -309,12 +310,6 @@ This class has subclasses for specific event types, such as `SubscriptionRenewal
 - `event_type`: Type of the event (e.g., 'created', 'renewed', 'canceled', 'status_changed', 'plan_changed')
 - `metadata`: JSON field for storing additional event-specific data
 
-**Methods**:
-- `log_event(event_type, metadata)` - Logs a custom event for the subscription
-- `subscription_events` - Returns all events for the subscription
-- `renewal_history` - Returns all renewal events for the subscription. The details of the renewal are stored in the metadata field.
-- `status_change_history` - Returns all status change events for the subscription. The from and to statuses are stored in the metadata field.
-
 **Usage**:
 ```ruby
 # Automatically logged when a subscription is created
@@ -333,18 +328,24 @@ latest_event = subscription.subscription_events.last
 puts "Last event type: #{latest_event.event_type}, metadata: #{latest_event.metadata}"
 ```
 
-### Additional fields
-#### SubscriptionRenewalEvent
+#### Subclasses
+##### SubscriptionRenewalEvent
 - `price_cents`: The price of the renewal in cents
 - `renewed_until`: The end date of the renewal
+- `renewed_at`: The date and time of the renewal
 
-#### SubscriptionStatusChangeEvent
+##### SubscriptionStatusChangeEvent
 - `from`: The previous status of the subscription
 - `to`: The new status of the subscription
 
-#### SubscriptionPlanChangeEvent
+##### SubscriptionPlanChangeEvent
 - `from_plan`: The previous plan of the subscription
 - `to_plan`: The new plan of the subscription
+
+##### SubscriptionCancellationEvent
+- `reason`: The reason for the cancellation
+- `at_period_end`: Whether the cancellation is scheduled for the end of the current period
+- `canceled_at`: The date and time of the cancellation
 
 > [!NOTE]
 > Other models and features are being developed and will be added in future releases.
