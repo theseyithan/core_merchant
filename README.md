@@ -11,7 +11,7 @@ CoreMerchant is a library for customer, product, and subscription management in 
 - [X] Add SubscriptionPlan model
 - [X] Add Subscription model
 - [X] Implement subscription manager and callbacks
-- [ ] Implement SubscriptionEvent model for logging
+- [X] Implement SubscriptionEvent model for logging
 - [ ] Add Invoice model
 - [ ] Add billing and invoicing service
 
@@ -47,7 +47,7 @@ CoreMerchant is a library for customer, product, and subscription management in 
 # Installation
 Add this line to your application's Gemfile:
 ```
-gem 'core_merchant', '~> 0.1.0'
+gem 'core_merchant', '~> 0.10.0'
 ```
 and run `bundle install`.
 
