@@ -2,6 +2,7 @@
 
 require "core_merchant/concerns/subscription_state_machine"
 require "core_merchant/concerns/subscription_notifications"
+require "core_merchant/concerns/subscription_event_association"
 require "core_merchant/subscription_event"
 
 module CoreMerchant
@@ -53,32 +54,12 @@ module CoreMerchant
   class Subscription < ActiveRecord::Base # rubocop:disable Metrics/ClassLength
     include CoreMerchant::Concerns::SubscriptionStateMachine
     include CoreMerchant::Concerns::SubscriptionNotifications
+    include CoreMerchant::Concerns::SubscriptionEventAssociation
 
     self.table_name = "core_merchant_subscriptions"
 
     belongs_to :customer, polymorphic: true
     belongs_to :subscription_plan
-
-    has_many :events, class_name: "SubscriptionEvent", dependent: :destroy
-    has_many :renewal_events,
-             lambda {
-               where(event_type: SubscriptionRenewalEvent.event_type)
-             }, class_name: "SubscriptionRenewalEvent"
-
-    has_many :status_change_events,
-             lambda {
-               where(event_type: SubscriptionStatusChangeEvent.event_type)
-             }, class_name: "SubscriptionStatusChangeEvent"
-
-    has_many :plan_change_events,
-             lambda {
-               where(event_type: SubscriptionPlanChangeEvent.event_type)
-             }, class_name: "SubscriptionPlanChangeEvent"
-
-    has_many :cancellation_events,
-             lambda {
-               where(event_type: SubscriptionCancellationEvent.event_type)
-             }, class_name: "SubscriptionCancellationEvent"
 
     enum status: {
       pending: 0,
