@@ -57,12 +57,24 @@ module CoreMerchant
       metadata["price_cents"]
     end
 
+    def price_cents=(value)
+      self.metadata = metadata.merge(price_cents: value)
+    end
+
     def renewed_from
       metadata["renewed_from"].to_date
     end
 
+    def renewed_from=(value)
+      self.metadata = metadata.merge(renewed_from: value)
+    end
+
     def renewed_until
       metadata["renewed_until"].to_date
+    end
+
+    def renewed_until=(value)
+      self.metadata = metadata.merge(renewed_until: value)
     end
   end
 
@@ -72,8 +84,16 @@ module CoreMerchant
       metadata["from_status"]
     end
 
+    def from=(value)
+      self.metadata = metadata.merge(from_status: value)
+    end
+
     def to
       metadata["to_status"]
+    end
+
+    def to=(value)
+      self.metadata = metadata.merge(to_status: value)
     end
   end
 
@@ -84,9 +104,17 @@ module CoreMerchant
       CoreMerchant::SubscriptionPlan.find(id) if id
     end
 
+    def from_plan=(value)
+      self.metadata = metadata.merge(from_plan_id: value.id)
+    end
+
     def to_plan
       id = metadata["to_plan_id"]
       CoreMerchant::SubscriptionPlan.find(id) if id
+    end
+
+    def to_plan=(value)
+      self.metadata = metadata.merge(to_plan_id: value.id)
     end
   end
 
@@ -100,8 +128,16 @@ module CoreMerchant
       metadata["at_period_end"]
     end
 
+    def at_period_end=(value)
+      self.metadata = metadata.merge(at_period_end: value)
+    end
+
     def reason
       metadata["reason"]
+    end
+
+    def reason=(value)
+      self.metadata = metadata.merge(reason: value)
     end
   end
 end
