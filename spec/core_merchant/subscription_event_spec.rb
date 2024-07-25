@@ -44,4 +44,52 @@ RSpec.describe CoreMerchant::SubscriptionEvent do
       expect(renewal_event.renewed_until).to eq(1.month.from_now.to_date)
     end
   end
+
+  describe "status change event" do
+    let(:status_change_event) do
+      build(:subscription_event, :status_change).becomes(CoreMerchant::SubscriptionStatusChangeEvent)
+    end
+
+    it "has a from status" do
+      expect(status_change_event.from).to eq("active")
+    end
+
+    it "has a to status" do
+      expect(status_change_event.to).to eq("expired")
+    end
+  end
+
+  describe "plan change event" do
+    let(:plan_change_event) do
+      create(:subscription_plan, id: 1, name_key: "basic_monthly")
+      create(:subscription_plan, id: 2, name_key: "premium_monthly")
+
+      build(:subscription_event, :plan_change).becomes(CoreMerchant::SubscriptionPlanChangeEvent)
+    end
+
+    it "has a from plan" do
+      expect(plan_change_event.from_plan).to be_a(CoreMerchant::SubscriptionPlan)
+    end
+
+    it "has a to plan" do
+      expect(plan_change_event.to_plan).to be_a(CoreMerchant::SubscriptionPlan)
+    end
+  end
+
+  describe "cancellation event" do
+    let(:cancellation_event) do
+      build(:subscription_event, :cancellation).becomes(CoreMerchant::SubscriptionCancellationEvent)
+    end
+
+    it "has a canceled at date" do
+      expect(cancellation_event.canceled_at).to eq(cancellation_event.created_at)
+    end
+  end
+
+  describe "metadata" do
+    it "serializes metadata as JSON" do
+      subscription_event.metadata = { message: "Events are fun!" }
+      expect(subscription_event.metadata).to eq("message" => "Events are fun!")
+    end
+  end
 end
