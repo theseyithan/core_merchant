@@ -65,6 +65,22 @@ RSpec.describe CoreMerchant::Subscription do
     it "has many subscription events" do
       expect(subscription).to respond_to(:events)
     end
+
+    it "has many renewal events" do
+      expect(subscription).to respond_to(:renewal_events)
+    end
+
+    it "has many status change events" do
+      expect(subscription).to respond_to(:status_change_events)
+    end
+
+    it "has many plan change events" do
+      expect(subscription).to respond_to(:plan_change_events)
+    end
+
+    it "has many cancellation events" do
+      expect(subscription).to respond_to(:cancellation_events)
+    end
   end
 
   describe "persistence" do

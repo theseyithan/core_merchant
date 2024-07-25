@@ -58,7 +58,27 @@ module CoreMerchant
 
     belongs_to :customer, polymorphic: true
     belongs_to :subscription_plan
+
     has_many :events, class_name: "SubscriptionEvent", dependent: :destroy
+    has_many :renewal_events,
+             lambda {
+               where(event_type: SubscriptionRenewalEvent.event_type)
+             }, class_name: "SubscriptionRenewalEvent"
+
+    has_many :status_change_events,
+             lambda {
+               where(event_type: SubscriptionStatusChangeEvent.event_type)
+             }, class_name: "SubscriptionStatusChangeEvent"
+
+    has_many :plan_change_events,
+             lambda {
+               where(event_type: SubscriptionPlanChangeEvent.event_type)
+             }, class_name: "SubscriptionPlanChangeEvent"
+
+    has_many :cancellation_events,
+             lambda {
+               where(event_type: SubscriptionCancellationEvent.event_type)
+             }, class_name: "SubscriptionCancellationEvent"
 
     enum status: {
       pending: 0,
