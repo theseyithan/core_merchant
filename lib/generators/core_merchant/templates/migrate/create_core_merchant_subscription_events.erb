@@ -1,0 +1,14 @@
+# Created by: rails generate core_merchant:install
+class CreateCoreMerchantSubscriptionEvents < ActiveRecord::Migration[<%= ActiveRecord::Migration.current_version %>]
+  def change
+    create_table :core_merchant_subscription_events do |t|
+      t.references :subscription, null: false, foreign_key: { to_table: :core_merchant_subscriptions }
+      t.string :event_type, null: false
+      t.jsonb :metadata, default: {}, null: false
+
+      t.timestamps
+
+      t.index :event_type
+    end
+  end
+end

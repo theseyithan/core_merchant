@@ -43,6 +43,13 @@ RSpec.describe CoreMerchant::Generators::InstallGenerator, type: :generator do
     end
   end
 
+  it "creates the subscription event migration file" do
+    assert_migration "db/migrate/create_core_merchant_subscription_events.rb" do |migration|
+      assert_match(/class CreateCoreMerchantSubscriptionEvents < ActiveRecord::Migration\[7\.1\]/, migration)
+      assert_match(/create_table :core_merchant_subscription_events/, migration)
+    end
+  end
+
   it "creates the locale file" do
     assert_file "config/locales/core_merchant.en.yml"
   end
