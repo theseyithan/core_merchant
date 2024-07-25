@@ -38,7 +38,13 @@ ActiveRecord::Schema.define do
   create_table :core_merchant_subscription_events, force: true do |t|
     t.references :subscription, null: false, foreign_key: { to_table: :core_merchant_subscriptions }
     t.string :event_type, null: false
-    t.string :message
+
+    if t.respond_to?(:jsonb)
+      t.jsonb :metadata, default: {}
+    else
+      t.text :metadata
+    end
+
     t.timestamps
   end
 end

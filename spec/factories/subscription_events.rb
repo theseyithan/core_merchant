@@ -5,11 +5,11 @@ FactoryBot.define do
     association :subscription, factory: :subscription
 
     event_type { :test }
-    message { "Subscription is being tested" }
+    metadata { { message: "Events are fun!" } }
 
     trait :renewal do
       event_type { :renewal }
-      metadata { { price_cents: 9_99, renewed_until: 1.month.from_now } }
+      metadata { { price_cents: 9_99, renewed_from: Date.today, renewed_until: 1.month.from_now } }
     end
 
     trait :status_change do

@@ -36,6 +36,15 @@ module CoreMerchant
     belongs_to :subscription, class_name: "CoreMerchant::Subscription"
 
     validates :event_type, presence: true
+
+    def metadata
+      value = self[:metadata]
+      value.is_a?(Hash) ? value : JSON.parse(value || "{}")
+    end
+
+    def metadata=(value)
+      self[:metadata] = value.is_a?(Hash) ? value.to_json : value
+    end
   end
 
   # Represents a renewal event for a subscription.
@@ -44,12 +53,12 @@ module CoreMerchant
       metadata["price_cents"]
     end
 
-    def renewed_at
-      created_at
+    def renewed_from
+      metadata["renewed_from"].to_date
     end
 
     def renewed_until
-      metadata["renewed_until"]
+      metadata["renewed_until"].to_date
     end
   end
 
