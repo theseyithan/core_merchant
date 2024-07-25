@@ -104,6 +104,11 @@ module CoreMerchant
       return unless subscription.transition_to_active
 
       subscription.start_new_period
+      subscription.renewal_events.create!(
+        price_cents: subscription.subscription_plan.price_cents,
+        renewed_from: subscription.current_period_start, renewed_until: subscription.current_period_end
+      )
+
       notify(subscription, :renewed)
     end
 

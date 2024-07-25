@@ -77,5 +77,50 @@ RSpec.describe CoreMerchant::Subscription do
       expect(event.at_period_end?).to eq(true)
       expect(event.canceled_at).to be_within(1.second).of(Time.current)
     end
+
+    it "logs an event when a subscription is started" do
+      subscription.save
+      subscription.start
+      expect(subscription.events.count).to eq(1)
+
+      event = subscription.status_change_events.first
+      expect(event.event_type).to eq("status_change")
+      expect(event.from).to eq("pending")
+      expect(event.to).to eq("active")
+    end
+
+    it "logs an event when a subscription is canceled" do
+      subscription.save
+      subscription.start
+      subscription.cancel(reason: "Too expensive", at_period_end: true)
+      # pending -> active, active -> pending_cancellation: 2 status change + 1 cancellation
+      expect(subscription.events.count).to eq(3)
+      expect(subscription.status_change_events.count).to eq(2)
+      expect(subscription.cancellation_events.count).to eq(1)
+
+      event = subscription.cancellation_events.first
+      expect(event.event_type).to eq("cancellation")
+      expect(event.reason).to eq("Too expensive")
+      expect(event.at_period_end?).to eq(true)
+    end
+
+    it "logs an event when a subscription is renewed" do
+      subscription.save
+      subscription.start
+
+      CoreMerchant.subscription_manager.process_for_renewal(subscription)
+      CoreMerchant.subscription_manager.no_payment_needed_for_renewal(subscription)
+
+      # pending -> active, active -> processing_renewal, processing_renewal -> active: 3 status change + 1 renewal
+      expect(subscription.events.count).to eq(4)
+      expect(subscription.status_change_events.count).to eq(3)
+      expect(subscription.renewal_events.count).to eq(1)
+
+      event = subscription.renewal_events.first
+      expect(event.event_type).to eq("renewal")
+      expect(event.price_cents).to eq(subscription.subscription_plan.price_cents)
+      expect(event.renewed_from).to eq(subscription.current_period_start)
+      expect(event.renewed_until).to eq(subscription.current_period_end)
+    end
   end
 end

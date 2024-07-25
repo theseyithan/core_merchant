@@ -37,10 +37,6 @@ module CoreMerchant
 
     validates :event_type, presence: true
 
-    def self.event_type
-      name.demodulize.underscore
-    end
-
     def metadata
       value = self[:metadata]
       value.is_a?(Hash) ? value : JSON.parse(value || "{}")

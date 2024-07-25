@@ -123,6 +123,7 @@ module CoreMerchant
       end
 
       notify_subscription_manager(:canceled, reason: reason, immediate: !at_period_end)
+      cancellation_events.create!(reason: reason, at_period_end: at_period_end)
     end
 
     # Starts a new period for the subscription.

@@ -10,6 +10,7 @@ module CoreMerchant
 
       included do
         has_many :events, class_name: "SubscriptionEvent", dependent: :destroy
+        after_update :create_status_change_event, if: :saved_change_to_status?
 
         EVENT_TYPES.each do |event_type|
           scope_name = "#{event_type}_events".to_sym
@@ -20,6 +21,10 @@ module CoreMerchant
           define_method "create_#{event_type}_event" do |**metadata|
             events.create!(event_type: event_type, metadata: metadata)
           end
+        end
+
+        def create_status_change_event
+          status_change_events.create!(from: saved_changes["status"].first, to: status)
         end
       end
     end
