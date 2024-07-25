@@ -34,4 +34,11 @@ ActiveRecord::Schema.define do
     t.string :cancellation_reason
     t.timestamps
   end
+
+  create_table :core_merchant_subscription_events, force: true do |t|
+    t.references :subscription, null: false, foreign_key: { to_table: :core_merchant_subscriptions }
+    t.integer :event_type, null: false
+    t.string :message
+    t.timestamps
+  end
 end

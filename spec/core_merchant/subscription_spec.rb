@@ -61,6 +61,10 @@ RSpec.describe CoreMerchant::Subscription do
     it "belongs to a subscription plan" do
       expect(subscription).to respond_to(:subscription_plan)
     end
+
+    it "has many subscription events" do
+      expect(subscription).to respond_to(:events)
+    end
   end
 
   describe "persistence" do

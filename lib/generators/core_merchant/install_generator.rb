@@ -39,7 +39,7 @@ module CoreMerchant
           Next steps:
           1. Set the customer class in the initializer file (config/initializers/core_merchant.rb) to the class you want to use for customers.
           2. Create a subscription listener class (should include CoreMerchant::SubscriptionListener) in your app and set this class in the initializer file (config/initializers/core_merchant.rb) to the class you want to use for subscription listeners.
-          3. Run `rails db:migrate` to create the subscription and subscription plan tables.
+          3. Run `rails db:migrate` to create the subscription, subscription plan, and subscription event tables.
         MESSAGE
         say next_steps, :yellow
       end
@@ -50,7 +50,7 @@ module CoreMerchant
 
       def self.description
         <<~DESC
-          Installs CoreMerchant into your application. This generator will create an initializer file, migration files for the subscription and subscription plan tables, and a locale file."
+          Installs CoreMerchant into your application. This generator will create an initializer file, migration files for the subscription, subscription plan, and subscription event tables, and a locale file.
         DESC
       end
     end

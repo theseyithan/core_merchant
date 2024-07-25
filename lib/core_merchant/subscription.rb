@@ -2,6 +2,7 @@
 
 require "core_merchant/concerns/subscription_state_machine"
 require "core_merchant/concerns/subscription_notifications"
+require "core_merchant/subscription_event"
 
 module CoreMerchant
   # Represents a subscription in CoreMerchant.
@@ -57,6 +58,7 @@ module CoreMerchant
 
     belongs_to :customer, polymorphic: true
     belongs_to :subscription_plan
+    has_many :events, class_name: "SubscriptionEvent", dependent: :destroy
 
     enum status: {
       pending: 0,
