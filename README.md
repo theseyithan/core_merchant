@@ -11,7 +11,7 @@ CoreMerchant is a library for customer, product, and subscription management in 
 - [X] Add SubscriptionPlan model
 - [X] Add Subscription model
 - [X] Implement subscription manager and callbacks
-- [ ] Add sidekiq jobs for subscription management
+- [ ] Implement SubscriptionEvent model for logging
 - [ ] Add Invoice model
 - [ ] Add billing and invoicing service
 
@@ -19,25 +19,31 @@ CoreMerchant is a library for customer, product, and subscription management in 
 - [CoreMerchant](#coremerchant)
   - [To-dos until 1.0.0 release](#to-dos-until-100-release)
   - [Table of contents](#table-of-contents)
-  - [Installation](#installation)
-  - [Usage](#usage)
-    - [Initialization](#initialization)
-    - [Configuration](#configuration)
-      - [1. Customer class](#1-customer-class)
-      - [2. Subscription listener class](#2-subscription-listener-class)
-    - [Subscription management](#subscription-management)
-      - [Creating a subscription plan](#creating-a-subscription-plan)
-      - [Creating a subscription](#creating-a-subscription)
-      - [Cancelling a subscription](#cancelling-a-subscription)
-      - [Handling subscription events](#handling-subscription-events)
-  - [Models](#models)
+- [Installation](#installation)
+- [Usage](#usage)
+  - [Initialization](#initialization)
+  - [Configuration](#configuration)
+    - [1. Customer class](#1-customer-class)
+    - [2. Subscription listener class](#2-subscription-listener-class)
+  - [Subscription management](#subscription-management)
+    - [Creating a subscription plan](#creating-a-subscription-plan)
+    - [Creating a subscription](#creating-a-subscription)
+    - [Cancelling a subscription](#cancelling-a-subscription)
+    - [Handling subscription events](#handling-subscription-events)
+    - [Subscription History](#subscription-history)
+  - [Public API](#public-api)
     - [SubscriptionManager](#subscriptionmanager)
     - [SubscriptionPlan](#subscriptionplan)
     - [Subscription](#subscription)
+    - [SubscriptionEvent](#subscriptionevent)
+    - [Additional fields](#additional-fields)
+      - [SubscriptionRenewalEvent](#subscriptionrenewalevent)
+      - [SubscriptionStatusChangeEvent](#subscriptionstatuschangeevent)
+      - [SubscriptionPlanChangeEvent](#subscriptionplanchangeevent)
   - [Contributing](#contributing)
 
 
-## Installation
+# Installation
 Add this line to your application's Gemfile:
 ```
 gem 'core_merchant', '~> 0.1.0'
@@ -49,8 +55,8 @@ Alternatively, you can install the gem manually:
 $ gem install core_merchant
 ```
 
-## Usage
-### Initialization
+# Usage
+## Initialization
 Run the generator to create the initializer file and the migrations:
 ```
 $ rails generate core_merchant:install
@@ -66,10 +72,10 @@ You can then run the migrations:
 $ rails db:migrate
 ```
 
-### Configuration
+## Configuration
 The initializer file `config/initializers/core_merchant.rb` contains the following configuration options:
 
-#### 1. Customer class
+### 1. Customer class
 ```ruby
 config.customer_class = 'User'
 ```
@@ -84,7 +90,7 @@ class User < ApplicationRecord
 end
 ```
 
-#### 2. Subscription listener class
+### 2. Subscription listener class
 ```ruby
 config.subscription_listener_class = 'MySubscriptionListener'
 ```
@@ -101,15 +107,15 @@ end
 
 More about subscription events in the [Handling subscription events](#handling-subscription-events) section.
 
-### Subscription management
+## Subscription management
 
-#### Creating a subscription plan
+### Creating a subscription plan
 You can create a subscription plan using the `SubscriptionPlan` model:
 ```ruby
 CoreMerchant::SubscriptionPlan.create(name_key: 'basic', price_cents: 10_00, duration: '1m')
 ```
 
-#### Creating a subscription
+### Creating a subscription
 You can create a subscription for a customer using the `Subscription` model:
 ```ruby
 customer = User.find(1)
@@ -122,13 +128,13 @@ Note that the subscription will not be active until you start it:
 subscription.start
 ```
 
-#### Cancelling a subscription
+### Cancelling a subscription
 You can cancel a subscription by calling the `cancel` method. You can also specify a reason for the cancellation and whether the cancellation should take effect immediately or at the end of the current billing period:
 ```ruby
 subscription.cancel(reason: 'Customer request', at_period_end: false)
 ```
 
-#### Handling subscription events
+### Handling subscription events
 You can handle subscription events by implementing event handlers in the subscription listener class. For example, you can send an email to the customer when a subscription is created:
 ```ruby
 class MySubscriptionListener
@@ -173,7 +179,29 @@ Available subscription events:
 - `on_subscription_renewal_payment_processing(subscription)`
 - `on_subscription_grace_period_started(subscription, days_remaining:)`
 
-## Models
+### Subscription History
+CoreMerchant now keeps a detailed history of subscription events, including creations, renewals, cancellations, status changes, and plan changes. This provides an audit trail and can be useful for debugging, customer support, and analytics.
+
+To access a subscription's history:
+```ruby
+subscription = CoreMerchant::Subscription.find(42)
+
+# Get all events
+subscription.subscription_events
+
+# Get specific event types
+latest_renewal = subscription.renewal_events.last
+puts "Last renewed at: #{latest_renewal.created_at}"
+puts "Renewal price: #{latest_renewal.price_cents} cents, renewed until: #{latest_renewal.renewed_until}"
+
+latest_status_change = subscription.status_change_events.last
+puts "Status changed from #{latest_status_change.from} to #{latest_status_change.to}"
+
+latest_plan_change = subscription.plan_change_events.last
+puts "Plan changed from #{latest_plan_change.from_plan.name} to #{latest_plan_change.to_plan.name}"
+```
+
+## Public API
 ### SubscriptionManager
 Access from `CoreMerchant.subscription_manager`. The `SubscriptionManager` class is responsible for managing subscriptions. It is responsible for notifying listeners when subscription events occur and checking for and handling renewals.
 
@@ -270,6 +298,53 @@ subscription = CoreMerchant::Subscription.create(customer: user, subscription_pl
 subscription.start
 subscription.cancel(reason: "Too expensive", at_period_end: true)
 ```
+
+### SubscriptionEvent
+The `SubscriptionEvent` model represents a historical log of events related to a subscription. It provides an audit trail of all significant actions and state changes for a subscription.
+
+This class has subclasses for specific event types, such as `SubscriptionRenewalEvent`, `SubscriptionStatusChangeEvent`, and `SubscriptionPlanChangeEvent`. Each subclass has additional fields specific to the event type.
+
+**Attributes**:
+- `subscription`: Association to the related Subscription
+- `event_type`: Type of the event (e.g., 'created', 'renewed', 'canceled', 'status_changed', 'plan_changed')
+- `metadata`: JSON field for storing additional event-specific data
+
+**Methods**:
+- `log_event(event_type, metadata)` - Logs a custom event for the subscription
+- `subscription_events` - Returns all events for the subscription
+- `renewal_history` - Returns all renewal events for the subscription. The details of the renewal are stored in the metadata field.
+- `status_change_history` - Returns all status change events for the subscription. The from and to statuses are stored in the metadata field.
+
+**Usage**:
+```ruby
+# Automatically logged when a subscription is created
+subscription = CoreMerchant::Subscription.create(customer: user, subscription_plan: plan)
+
+# Logging a custom event
+subscription.log_event('custom_event', key: 'value')
+
+# Retrieve the last renewal event
+latest_renewal = subscription.renewal_events.last
+puts "Last renewed at: #{latest_renewal.created_at}"
+puts "Renewal price: #{latest_renewal.price_cents} cents, renewed until: #{latest_renewal.renewed_until}"
+
+# Retrieve the last event of any type
+latest_event = subscription.subscription_events.last
+puts "Last event type: #{latest_event.event_type}, metadata: #{latest_event.metadata}"
+```
+
+### Additional fields
+#### SubscriptionRenewalEvent
+- `price_cents`: The price of the renewal in cents
+- `renewed_until`: The end date of the renewal
+
+#### SubscriptionStatusChangeEvent
+- `from`: The previous status of the subscription
+- `to`: The new status of the subscription
+
+#### SubscriptionPlanChangeEvent
+- `from_plan`: The previous plan of the subscription
+- `to_plan`: The new plan of the subscription
 
 > [!NOTE]
 > Other models and features are being developed and will be added in future releases.
