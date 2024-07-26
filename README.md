@@ -5,7 +5,8 @@
 
 CoreMerchant is a library for customer, product, and subscription management in Rails applications. It's meant to be a starting point for building e-commerce and SaaS applications. It provides essential functionality for handling customers, products, and subscriptions. Does not include payment integrations.
 
-## To-dos until 1.0.0 release
+## To-do
+**Until 1.0.0 release**
 - [X] Add customer behavior
 - [X] Add initializer generator
 - [X] Add SubscriptionPlan model
@@ -15,9 +16,13 @@ CoreMerchant is a library for customer, product, and subscription management in 
 - [ ] Add Invoice model
 - [ ] Add billing and invoicing service
 
+**For future releases**
+- [ ] Add Product model
+- [ ] Add Cart model
+
 ## Table of contents
 - [CoreMerchant](#coremerchant)
-  - [To-dos until 1.0.0 release](#to-dos-until-100-release)
+  - [To-do](#to-do)
   - [Table of contents](#table-of-contents)
 - [Installation](#installation)
 - [Usage](#usage)
