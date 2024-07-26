@@ -86,5 +86,29 @@ RSpec.describe CoreMerchant::SubscriptionManager do
       expect(listener).to receive(:on_subscription_expired).with(subscription)
       manager.notify(subscription, :expired)
     end
+
+    describe "with public methods" do
+      it "sends the subscription started event" do
+        subscription = create(:subscription)
+        expect(listener).to receive(:on_subscription_started).with(subscription)
+
+        manager.start_subscription(subscription)
+      end
+
+      it "sends the subscription canceled event" do
+        subscription = create(:subscription)
+        manager.start_subscription(subscription)
+        expect(listener).to receive(:on_subscription_canceled).with(subscription, reason: "test", immediate: true)
+
+        manager.cancel_subscription(subscription, reason: "test", at_period_end: false)
+      end
+
+      it "sends the subscription due for renewal event" do
+        subscription = create(:subscription, current_period_start: 1.month.ago, current_period_end: 1.day.ago)
+        expect(listener).to receive(:on_subscription_due_for_renewal).with(subscription)
+
+        manager.process_for_renewal(subscription)
+      end
+    end
   end
 end
