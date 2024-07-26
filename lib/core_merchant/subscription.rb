@@ -51,7 +51,7 @@ module CoreMerchant
   #   subscription.start
   #   subscription.cancel(reason: "Too expensive", at_period_end: true)
   #   ```
-  class Subscription < ActiveRecord::Base # rubocop:disable Metrics/ClassLength
+  class Subscription < ActiveRecord::Base
     include CoreMerchant::Concerns::SubscriptionStateMachine
     include CoreMerchant::Concerns::SubscriptionNotifications
     include CoreMerchant::Concerns::SubscriptionEventAssociation
@@ -89,18 +89,7 @@ module CoreMerchant
     # Starts the subscription.
     # Sets the current period start and end dates based on the plan's duration.
     def start
-      new_period_start = start_date
-      new_period_end = new_period_start + subscription_plan.duration_in_date
-
-      transaction do
-        transition_to_active!
-        update!(
-          current_period_start: new_period_start.to_date,
-          current_period_end: new_period_end.to_date
-        )
-      end
-
-      notify_subscription_manager(:started)
+      CoreMerchant.subscription_manager.start_subscription(self)
     end
 
     # Cancels the subscription.
@@ -110,26 +99,13 @@ module CoreMerchant
     #   Otherwise, the subscription will be canceled immediately.
     #   Default is `true`.
     def cancel(reason:, at_period_end: true)
-      transaction do
-        if at_period_end
-          transition_to_pending_cancellation!
-        else
-          transition_to_canceled!
-        end
-        update!(
-          canceled_at: at_period_end ? current_period_end : Time.current,
-          cancellation_reason: reason
-        )
-      end
-
-      notify_subscription_manager(:canceled, reason: reason, immediate: !at_period_end)
-      cancellation_events.create!(reason: reason, at_period_end: at_period_end)
+      CoreMerchant.subscription_manager.cancel_subscription(self, reason: reason, at_period_end: at_period_end)
     end
 
     # Starts a new period for the subscription.
     # This is called by SubscriptionManager when a subscription renewal is successful.
     def start_new_period
-      new_period_start = current_period_end
+      new_period_start = current_period_end || start_date
       new_period_end = new_period_start + subscription_plan.duration_in_date
 
       update!(

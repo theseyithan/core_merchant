@@ -55,6 +55,40 @@ module CoreMerchant
       end
     end
 
+    # Starts the subscription.
+    # Sets the current period start and end dates based on the plan's duration.
+    def start_subscription(subscription)
+      subscription.transaction do
+        subscription.start_new_period
+        subscription.transition_to_active!
+      end
+
+      notify(subscription, :started)
+    end
+
+    # Cancels the subscription.
+    # Parameters:
+    # - `reason`: Reason for cancellation
+    # - `at_period_end`: If true, the subscription will be canceled at the end of the current period.
+    #   Otherwise, the subscription will be canceled immediately.
+    #   Default is `true`.
+    def cancel_subscription(subscription, reason:, at_period_end: true)
+      subscription.transaction do
+        if at_period_end
+          subscription.transition_to_pending_cancellation!
+        else
+          subscription.transition_to_canceled!
+        end
+        subscription.update!(
+          canceled_at: at_period_end ? subscription.current_period_end : Time.current,
+          cancellation_reason: reason
+        )
+      end
+
+      notify(subscription, :canceled, reason: reason, immediate: !at_period_end)
+      subscription.cancellation_events.create!(reason: reason, at_period_end: at_period_end)
+    end
+
     def process_for_renewal(subscription)
       return unless subscription.transition_to_processing_renewal
 
