@@ -29,23 +29,11 @@ RSpec.describe CoreMerchant::Generators::InstallGenerator, type: :generator do
     end
   end
 
-  it "creates the subscription plan migration file" do
-    assert_migration "db/migrate/create_core_merchant_subscription_plans.rb" do |migration|
-      assert_match(/class CreateCoreMerchantSubscriptionPlans < ActiveRecord::Migration\[7\.1\]/, migration)
+  it "creates the migration file" do
+    assert_migration "db/migrate/create_core_merchant_tables.rb" do |migration|
+      assert_match(/class CreateCoreMerchantTables < ActiveRecord::Migration\[7\.1\]/, migration)
       assert_match(/create_table :core_merchant_subscription_plans/, migration)
-    end
-  end
-
-  it "creates the subscription migration file" do
-    assert_migration "db/migrate/create_core_merchant_subscriptions.rb" do |migration|
-      assert_match(/class CreateCoreMerchantSubscriptions < ActiveRecord::Migration\[7\.1\]/, migration)
       assert_match(/create_table :core_merchant_subscriptions/, migration)
-    end
-  end
-
-  it "creates the subscription event migration file" do
-    assert_migration "db/migrate/create_core_merchant_subscription_events.rb" do |migration|
-      assert_match(/class CreateCoreMerchantSubscriptionEvents < ActiveRecord::Migration\[7\.1\]/, migration)
       assert_match(/create_table :core_merchant_subscription_events/, migration)
     end
   end

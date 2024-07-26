@@ -23,14 +23,10 @@ module CoreMerchant
       end
 
       def create_migration_file
-        migration_template "migrate/create_core_merchant_subscription_plans.erb",
-                           "db/migrate/create_core_merchant_subscription_plans.rb"
-
-        migration_template "migrate/create_core_merchant_subscriptions.erb",
-                           "db/migrate/create_core_merchant_subscriptions.rb"
-
-        migration_template "migrate/create_core_merchant_subscription_events.erb",
-                           "db/migrate/create_core_merchant_subscription_events.rb"
+        migration_template(
+          "migrate/create_core_merchant_tables.erb",
+          "db/migrate/create_core_merchant_tables.rb"
+        )
       end
 
       def show_post_install
