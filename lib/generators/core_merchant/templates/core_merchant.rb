@@ -7,7 +7,7 @@ CoreMerchant.configure do |config|
   #   include CoreMerchant::CustomerBehavior
   #   ...
   # end
-  config.customer_class = "User"
+  # config.customer_class = "User"
 
   # Set the class that will receive subscription notifications/
   # This class must include the CoreMerchant::SubscriptionListener module.
@@ -22,5 +22,5 @@ CoreMerchant.configure do |config|
   #
   # To test notifications to this class, you can override `on_test_event_received` method
   # and call `CoreMerchant.subscription_manager.notify_test_event`.
-  config.subscription_listener_class = "SubscriptionListener"
+  # config.subscription_listener_class = "SubscriptionListener"
 end
