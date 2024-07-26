@@ -57,6 +57,36 @@ $ gem install core_merchant
 ```
 
 # Usage
+The steps below will guide you through setting up CoreMerchant in your Rails application. After completing these steps, you will be able to create subscription plans, manage subscriptions, and handle subscription events.
+
+```ruby
+# Create a subscription plan
+plan = CoreMerchant::SubscriptionPlan.create(name_key: 'basic', price_cents: 9_99, duration: '1m')
+
+# Subscribe a customer to the plan
+customer = current_user
+subscription = CoreMerchant::Subscription.create(customer: customer, plan: plan)
+
+# Start the subscription
+CoreMerchant.subscription_manager.start_subscription(subscription)
+
+# Use a listener to handle subscription events
+class MySubscriptionListener
+  include CoreMerchant::SubscriptionListener
+
+  def on_subscription_started(subscription)
+    puts "Subscription started for #{subscription.customer.email}, subscribed to #{subscription.plan.name}"
+  end
+
+  def on_subscription_due_for_renewal(subscription)
+    puts "Subscription due for renewal for #{subscription.customer.email}, renewing until #{subscription.current_period_end_date}"
+
+    # After payment is processed
+    CoreMerchant.subscription_manager.payment_successful_for_renewal(subscription)
+  end
+end
+```
+
 ## Initialization
 Run the generator to create the initializer file and the migrations:
 ```

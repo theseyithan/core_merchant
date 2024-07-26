@@ -40,15 +40,22 @@ module CoreMerchant
       @listeners = []
     end
 
+    # Checks all subscriptions for renewals and cancellations.
+    # Call this method periodically (probably daily) to check for subscriptions that need attention.
+    # This method will notify listeners when subscriptions are due for renewal or cancellation.
     def check_subscriptions
       check_renewals
       check_cancellations
     end
 
+    # Adds a listener to the list of listeners.
+    # You probably don't need to call this method directly. Instead, set the listener in the configuration.
+    # config.subscription_listener_class = "MySubscriptionListener"
     def add_listener(listener)
       @listeners << listener
     end
 
+    # Checks all subscriptions for renewals. Called by `check_subscriptions`.
     def check_renewals
       Subscription.find_each do |subscription|
         process_for_renewal(subscription) if subscription.due_for_renewal?
@@ -89,26 +96,39 @@ module CoreMerchant
       subscription.cancellation_events.create!(reason: reason, at_period_end: at_period_end)
     end
 
+    # Starts the subscription renewal process.
+    # This method is called when a subscription is due for renewal. It will in turn call notify the listener.
+    # When you receive a notification that a subscription is due for renewal, you should either call
+    # `no_payment_needed_for_renewal`, `processing_payment_for_renewal`, `payment_successful_for_renewal`, or
+    # `payment_failed_for_renewal` to continue the renewal process.
     def process_for_renewal(subscription)
       return unless subscription.transition_to_processing_renewal
 
       notify(subscription, :due_for_renewal)
     end
 
+    # Call this method when a subscription is renewed without payment.
+    # It will renew the subscription and notify listeners.
     def no_payment_needed_for_renewal(subscription)
       renew_subscription(subscription)
     end
 
+    # Call this method when payment is being processed for a renewal. This needs to be followed by either
+    # `payment_successful_for_renewal` or `payment_failed_for_renewal`.
     def processing_payment_for_renewal(subscription)
       return unless subscription.transition_to_processing_payment
 
       notify(subscription, :renewal_payment_processing)
     end
 
+    # Call this method when payment was successful for a renewal.
+    # It will renew the subscription and notify listeners.
     def payment_successful_for_renewal(subscription)
       renew_subscription(subscription)
     end
 
+    # Call this method when payment failed for a renewal.
+    # It will transition the subscription to past due when in grace period, or expired if not.
     def payment_failed_for_renewal(subscription)
       is_in_grace_period = subscription.in_grace_period?
       if is_in_grace_period
@@ -120,12 +140,15 @@ module CoreMerchant
       end
     end
 
+    # Checks all subscriptions for cancellations. Called by `check_subscriptions`.
     def check_cancellations
       Subscription.find_each do |subscription|
         process_for_cancellation(subscription) if subscription.pending_cancellation?
       end
     end
 
+    # Processes a subscription for cancellation.
+    # This method is called when a subscription is pending cancellation.
     def process_for_cancellation(subscription)
       return unless subscription.transition_to_expired
 
